@@ -1,7 +1,7 @@
 [tool.black]
-line-length = 88
+line-length = 79
 preview = true
 
 [flake8]
 max-complexity = 18
-max-line-length = 88
+max-line-length = 79
