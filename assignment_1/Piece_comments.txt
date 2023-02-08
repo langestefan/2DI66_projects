@@ -1,0 +1,46 @@
+REMARKS
+	1. Following numbering used:
+	- player 1 / white = 1
+	- player 2 / black = 2
+	- on the board:
+		- empty field = 0 
+		- white: 1-King, 2-Knight, 3-Rook, 4-Bishop, 5-Queen, 6-Pawn
+		- black: 7-King, 8-Knight, 9-Rook, 10-Bishop, 11-Queen, 12-Pawn
+
+	2. Every type of piece has its own method in class Piece that returns an array with 
+		shape (X, 5). X depends on the number of valid moves found.  
+	   The columns refer to the following:
+		- First and second columns = original x and y coordinates of piece 
+		- Third and fourth columns = x and y coordinates of possible move 
+		- Last column = number referring to piece (see remark 1). This column is 
+			mostly used to indicate if a pawn has promoted to queen, the
+			number will then also be that of a queen in this column 
+	   Assumption made: a player can only have copies of pawns and queens
+
+	3. General workflow for each method:
+		- Get all possible moves 
+		- Remove invalid moves based on field (moves that go outside board)
+			Invalid moves are indicated with a -1, -1 coordinate
+		- Remove invalid moves that go to a place where a player's own piece is 
+		- Special / specific cases:
+			- Remove invalid leaping (rook, queen, bishop)
+			- Remove invalid pawn movement (special case: 'normal' movement 
+				and capture movement are different)
+			- Remove column switching in case a piece has switched columns 
+				5 times already (see also remark 4)
+			- Remove invalid king movement where it puts itself in check
+
+	4. Column switching:
+		- The class expects an array consisting of two rows (row 1 = white, 
+			row 2 = black) and multiple columns. 
+		- First 6 columns refer to the pieces in the order given in remark 1
+		- Column 7 and onwards refer to pawns that promoted to queens > their 
+			column switching has been reset. It's also why pawns are not 
+			included in the checks as pawns before reaching other 
+			side have switched columns at maximum 3 times.
+		- Two values are expected: 0 (False, no column switching allowed anymore) 
+			or 1 (True, column switching is allowed)
+
+
+  
+	
