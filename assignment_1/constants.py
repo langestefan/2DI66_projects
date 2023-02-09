@@ -46,7 +46,7 @@ class ChessPieceTypes(Enum):
 
 # Chess piece definitions:
 PIECES = {
-    "White": {
+    Players.WHITE: {
         "KW": {
             "name": "WhiteKing",  # name of the piece
             "value": 0,  # value of the piece
@@ -118,7 +118,7 @@ PIECES = {
             "pos": np.array([3, 4]),
         },
     },
-    "Black": {
+    Players.BLACK: {
         "KB": {
             "name": "King",
             "value": 0,
