@@ -17,8 +17,8 @@ class Piece:
     next to the validate function doing general validation checks, there are 
     additional validation methods (leap_validate, column_validate, 
                                    king_check_validate, pawn_capt_validate)
-    These return an (X,2) array with first column being x and second being y 
-    coordinates. 
+    These return an (X,2) array named validated with first column being x and 
+    second being y coordinates. 
     
     pawn_promotion is a function to determine if a pawn has been promoted. 
     
@@ -57,6 +57,7 @@ class Piece:
             
     def king(self, check = True):
         '''
+        Returns valid moves for the king
 
         Parameters
         ----------
@@ -102,6 +103,9 @@ class Piece:
 
     
     def knight(self):
+        '''
+        Returns valid moves for the knight 
+        '''
         # get location of the knight
         knight_code = self.self_codes[1]
         old_loc = np.transpose(np.where(self.board == knight_code))
@@ -136,6 +140,9 @@ class Piece:
         return knight_moves
     
     def rook(self):
+        '''
+        Returns valid moves for the rook 
+        '''
         # get location of the rook
         rook_code = self.self_codes[2]
         old_loc = np.transpose(np.where(self.board == rook_code))
@@ -166,6 +173,9 @@ class Piece:
         return rook_moves
         
     def bishop(self):
+        '''
+        Returns valid moves for the bishop 
+        '''
         # get location of the bishop
         bishop_code = self.self_codes[3]
         old_loc = np.transpose(np.where(self.board == bishop_code))
@@ -196,6 +206,9 @@ class Piece:
         return bishop_moves
     
     def queen(self):
+        '''
+        Returns valid moves for the queen 
+        '''
         # get location of queen(s)
         queen_code = self.self_codes[4]
         old_loc = np.transpose(np.where(self.board == queen_code))
@@ -235,6 +248,9 @@ class Piece:
         return queen_moves
     
     def pawn(self):
+        '''
+        Returns valid moves for the pawns 
+        '''
         # get location of all pawns 
         pawn_code = self.self_codes[-1]
         old_loc = np.transpose(np.where(self.board == pawn_code))
