@@ -1,4 +1,5 @@
 REMARKS
+-----------------------------------------------------------------------------------------
 	1. Following numbering used:
 	- player 1 / white = 1
 	- player 2 / black = 2
