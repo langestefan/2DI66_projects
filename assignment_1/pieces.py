@@ -17,6 +17,8 @@ class Piece(ABC):
             [-1, -1], dtype=int
         )  # The position of the piece on the board.
         self.n_moves: int = 0  # The number of moves the piece can at max make.
+        self.column_switch: bool = False  # Whether the piece can switch columns
+        self.jump: bool = False  # Whether the piece can jump over other pieces
 
     def __str__(self):
         return f"{self.name} owned by player {self.player}"
@@ -60,6 +62,38 @@ class Piece(ABC):
         """
         pass
 
+    def validate_moves(
+        self, moves: np.ndarray, board: np.ndarray
+    ) -> np.ndarray:
+        """
+        Validates the moves gives moves for the piece.
+
+        :param moves: The moves to validate.
+        :param board: The current board state.
+        :return: A list of valid moves for the piece.
+        """
+        valid_moves = moves.copy()
+        print(valid_moves)
+        
+        for i, move in enumerate(moves):
+            x = move[2]  # row nr. of target position
+            y = move[3]  # col nr. of target position
+
+            # check if move goes outside field, remove from list 
+            if x > c.BOARD_SIZE-1 or x < 0 or y > c.BOARD_SIZE-1 or y < 0:
+                valid_moves[i, :] = -1
+                print("move outside field")
+                continue
+
+            # check if we can switch columns
+            if not self.column_switch and move[1] != move[3]:
+                valid_moves[i, :] = -1
+                print("cannot switch columns")
+                continue
+
+        print(valid_moves)
+        return valid_moves
+
 
 class Pawn(Piece):
     def __init__(self, player: c.Players):
@@ -88,6 +122,7 @@ class Knight(Piece):
         super().__init__(player)
         self.name = "Knight"
         self.symbol = "N"
+        self.jump = True
 
     def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
         valid_moves = np.ones((1, 4), dtype=int) * -1
@@ -126,11 +161,10 @@ class King(Piece):
 
     def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
         move_candidates = np.ones((self.n_moves, 4), dtype=int) * -1
-        valid_moves = np.ones((self.n_moves, 4), dtype=int) * -1
 
-        # write old position of this piece to valid_moves
+        # write old position of this piece to move candidates
         old_loc = [self.position]
-        move_candidates[:, 0:2] = np.repeat(old_loc, 5, axis=0)
+        move_candidates[:, 0:2] = np.repeat(old_loc, self.n_moves, axis=0)
 
         # get coordinates of move candidates
         x = old_loc[0][0]
@@ -145,5 +179,6 @@ class King(Piece):
         move_candidates[:, 2:4] = np.concatenate((new_x, new_y), axis=1)
 
         # TODO: check which move candidates are valid and filter them out
+        valid_moves = super().validate_moves(move_candidates, board)
 
         return valid_moves
