@@ -66,21 +66,39 @@ class Piece(ABC):
             raise ValueError("Piece is already on this position.")
         self.position = position
 
-    def _init_move_cand(self, n_moves: int):
-        move_cand = np.ones((n_moves, 4), dtype=int) * -1
-
-        # write old position of this piece to move candidates
-        old_loc = [self.position]
-        move_cand[:, 0:2] = np.repeat(old_loc, n_moves, axis=0)
-
-        # get coordinates of start position for new moves
-        x_old = old_loc[0][0]
-        y_old = old_loc[0][1]
+    def _init_move_cand(self, n_moves: int, copies = [], pos = []):
+        
+        if len(pos) == 0:
+            pos = self.position
+        
+        # if no copies of the same piece 
+        if len(copies) == 0:
+            move_cand = np.ones((n_moves, 4), dtype=int) * -1
+            
+            # write old position of this piece to move candidates
+            old_loc = [pos]
+            move_cand[:, 0:2] = np.repeat(old_loc, n_moves, axis=0)
+    
+            # get coordinates of start position for new moves
+            x_old = old_loc[0][0]
+            y_old = old_loc[0][1]
+           
+        # if per copy of a piece, additional moves need to be added
+        else:
+            total = n_moves*len(copies) + sum(copies)
+            move_cand = np.ones((total, 4), dtype=int) * -1
+            
+            nr_copies = [n_moves+x for x in copies]
+            move_cand[:, 0:2] = np.repeat(pos, nr_copies, axis=0)
+            
+            x_old = pos[:,0]
+            y_old = pos[:,1]
+            
 
         return x_old, y_old, move_cand
 
     def _get_diagonal_moves(
-        self, n_moves_d: int = c.BOARD_SIZE - 1
+        self, n_moves_d: int = c.BOARD_SIZE - 1, old_loc = []
     ) -> np.ndarray:
         """
         Returns a list of diagonal moves for the piece.
@@ -88,7 +106,10 @@ class Piece(ABC):
         :param n_moves_dir: Nr. of moves in one direction.
         :return: A list of diagonal moves for the piece.
         """
-        x_old, y_old, move_cand = self._init_move_cand(2 * n_moves_d)
+        if len(old_loc) > 0:
+            x_old, y_old, move_cand = self._init_move_cand(2 * n_moves_d, pos=old_loc)
+        else:
+            x_old, y_old, move_cand = self._init_move_cand(2 * n_moves_d)
 
         # y_new (columns) does not depend on whether it is white or black
         y_new = np.arange(y_old - n_moves_d, y_old + n_moves_d + 1)
@@ -116,6 +137,7 @@ class Piece(ABC):
         n_moves_d: int = c.BOARD_SIZE - 1,
         hor: bool = True,
         ver: bool = True,
+        old_loc = []
     ) -> np.ndarray:
         """
         Returns a list of vertical moves for the piece.
@@ -134,7 +156,10 @@ class Piece(ABC):
         if n_moves == 0:
             raise ValueError("At least one direction must be True.")
 
-        x_old, y_old, move_cand = self._init_move_cand(n_moves)
+        if len(old_loc) > 0:
+            x_old, y_old, move_cand = self._init_move_cand(n_moves, pos=old_loc)
+        else:
+            x_old, y_old, move_cand = self._init_move_cand(n_moves)
 
         # generate horizontal moves, does not depend on player
         if hor:
@@ -155,6 +180,7 @@ class Piece(ABC):
 
             if hor:
                 start_idx = 2 * n_moves_d
+                
             move_cand[start_idx : start_idx + len(x_new), 2] = x_new
             move_cand[start_idx : start_idx + len(x_new), 3] = y_old
 
@@ -227,6 +253,7 @@ class Piece(ABC):
             # TODO: if king is in check we only allow moves that get him out
             # TODO: if move puts our king in check, it's not valid
             # TODO: check if we can jump over pieces
+            # TODO: check if a player's own piece is present 
 
         # delete all moves with -1
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
@@ -236,16 +263,61 @@ class Piece(ABC):
 
 class Pawn(Piece):
     def __init__(
-        self, player: c.Players, init_pos=np.array([-1, -1], dtype=int)
+        self, player: c.Players, init_pos=np.array([-1, -1], dtype=int),
+        extra_step=np.array([1, 1, 1, 1, 1], dtype=bool)
     ):
         super().__init__(player, init_pos)
         self.name = "Pawn"
         self.symbol = "P"
+        
+        # note that this is for one pawn and excluding double step at beginning
+        self.n_moves = 3 
+        
+        self.init_pos = init_pos
+        self.extra_step = extra_step
+        
+    def __move_pawn(
+        self, x_old: int, y_old: int, move_cand: np.ndarray
+    ) -> np.ndarray:
+        """
+        Returns the coordinates of pawn moves 
+        """
+        total = self.n_moves*len(self.extra_step)+sum(self.extra_step)
+        x_new = np.zeros((total,))
+        y_new = np.zeros((total,))
+        
+        # get all possible moves 
+        index = 0
+        for i in range(len(self.extra_step)):
+            x_new[index:index+self.n_moves] = x_old[i]-1
+            y_new[index:index+self.n_moves] = np.array([y_old[i], y_old[i]-1, 
+                                                        y_old[i]+1])
+            index+=self.n_moves
+            if self.extra_step[i]:
+                x_new[index] = x_old[i]-2
+                y_new[index] = y_old[i]
+                index+=1
+
+        # if player is black, we need to mirror the row coordinates
+        if self.player == c.Players.BLACK:
+            x_new = x_new + np.repeat(np.array([2]), len(x_new), axis=0)
+
+        move_cand[0 : len(x_new), 2] = x_new
+        move_cand[0 : len(x_new), 3] = y_new
+
+        return move_cand
 
     def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
         valid_moves = np.ones((1, 4), dtype=int) * -1
+        
+        x_old, y_old, move_cand = super()._init_move_cand(self.n_moves, 
+                                                          self.extra_step)
+        
+        # get coordinates of all new moves, valid or not
+        move_cand = self.__move_pawn(x_old, y_old, move_cand)
 
-        # TODO: finish pawn implementation
+        # check which move candidates are valid and filter them out
+        valid_moves = super().validate_moves(move_cand, board)
 
         return valid_moves
 
@@ -287,12 +359,12 @@ class Knight(Piece):
         """
         Returns the coordinates of a knight move in the shape of an L.
         """
-        x_new = np.array([x_old + 1, x_old + 2, x_old + 2, x_old + 1])
+        x_new = np.array([x_old - 1, x_old - 2, x_old - 2, x_old - 1])
         y_new = np.array([y_old - 2, y_old - 1, y_old + 1, y_old + 2])
 
         # if player is black, we need to mirror the row coordinates
         if self.player == c.Players.BLACK:
-            x_new = x_new - np.array([2, 4, 4, 2])
+            x_new = x_new + np.array([2, 4, 4, 2])
 
         move_cand[0 : len(x_new), 2] = x_new
         move_cand[0 : len(x_new), 3] = y_new
@@ -304,7 +376,7 @@ class Knight(Piece):
 
         # get coordinates of all new moves, valid or not
         move_cand = self.__move_l_shape(x_old, y_old, move_cand)
-
+        
         # check which move candidates are valid and filter them out
         valid_moves = super().validate_moves(move_cand, board)
 
@@ -334,21 +406,27 @@ class Bishop(Piece):
 
 class Queen(Piece):
     def __init__(
-        self, player: c.Players, init_pos=np.array([-1, -1], dtype=int)
+        self, player: c.Players, init_pos=np.array([-1, -1], dtype=int),
+        copies=[]
     ):
         super().__init__(player, init_pos)
         self.name = "Queen"
         self.symbol = "Q"
         # queen can go in any direction (not down)
         self.n_moves = 5 * (c.BOARD_SIZE - 1)
+        
+        self.copies = copies
 
     def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
-        _, _, move_cand = super()._init_move_cand(self.n_moves)
+        _, _, move_cand = super()._init_move_cand(self.n_moves, copies=self.copies)
 
         # get coordinates of all new moves, valid or not
-        diag_mov = super()._get_diagonal_moves()
-        straight_mov = super()._get_straight_moves()
-        move_cand = np.concatenate((diag_mov, straight_mov), axis=0)
+        for q in range(len(self.copies)):
+            counter = q*self.n_moves
+            diag_mov = super()._get_diagonal_moves(old_loc = self.position[q])
+            straight_mov = super()._get_straight_moves(old_loc = self.position[q])
+            move_cand[counter:counter+self.n_moves, :] = np.concatenate((diag_mov, straight_mov), 
+                                                            axis=0)
 
         # check which move candidates are valid and filter them out
         valid_moves = super().validate_moves(move_cand, board)
