@@ -19,6 +19,15 @@ class GameHistory:
         self.game_runs: list[GameState] = []
         self.games_played = 0
 
+    def __str__(self):
+        str = f"Number of games played: {self.games_played}"
+
+        for game_run in self.game_runs:
+            str += f"\n Final game state: {game_run.get_game_state()}"
+            str += f"\n Round number: {game_run.get_round_number()}"
+
+        return str
+            
     def add_game_run(self, game_run):
         """
         Adds a game run to the game runs.
@@ -50,10 +59,11 @@ class Simulator(ABC):
     A base class to represent a simulator.
     """
 
-    def __init__(self, parallelize: bool = False):
+    def __init__(self, parallelize: bool):
         super().__init__()
         self.game_history: GameHistory = GameHistory()
         self.parallelize = parallelize
+        self.n_jobs = mp.cpu_count()//2
 
     def get_game_history(self) -> GameHistory:
         """
@@ -64,7 +74,7 @@ class Simulator(ABC):
         if self.game_history is None:
             raise ValueError(
                 "Game history is not initialized. Did you call"
-                " start_simulation()?"
+                " run()?"
             )
         return self.game_history
 
@@ -91,21 +101,23 @@ class Simulator(ABC):
         """
         # if parallelization is enabled, use multiprocessing
         if parallelize:
-            with mp.Pool() as pool:
-                results = pool.map(self._do_one_run, range(n))  # type: ignore
+            with mp.Pool(processes=self.n_jobs) as pool:
+                results = pool.map(self._do_one_run, range(n))
 
                 # add the results to the game history
                 for result in results:
                     game_history.add_game_run(result)
         else:
             for i in range(n):
-                result = self._do_one_run()
+                result = self._do_one_run(i)
                 game_history.add_game_run(result)
 
     @abstractmethod
-    def _do_one_run(self) -> None:
+    def _do_one_run(self, n: int) -> GameState:
         """
         Runs one game.
+
+        :param n: The number of the game run.
         """
         pass
 
@@ -115,12 +127,12 @@ class ChessSimulator(Simulator):
     Implements the chess specific simulator.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parallelize: bool = False):
+        super().__init__(parallelize=parallelize)
         self.white_strat = RandomStrategy(player=c.Players.WHITE)
         self.black_strat = RandomStrategy(player=c.Players.BLACK)
 
-    def _do_one_run(self) -> GameState:
+    def _do_one_run(self, n: int) -> GameState:
         """
         Runs one full game from start to win/draw.
 
@@ -130,7 +142,14 @@ class ChessSimulator(Simulator):
 
         # run the game until it is over, then return the final game state obj
         while game_state.get_game_state() == c.GameStates.ONGOING:
+            
+            # break for testing purposes
+            if game_state.get_round_number() > 10:
+                break
+
+            # increment the round number
             game_state.increment_round_number()
+
             if game_state.get_current_player() == c.Players.WHITE:
                 print("White's turn")
                 move = self.white_strat.get_move(game_state)
@@ -138,12 +157,12 @@ class ChessSimulator(Simulator):
                 print("Black's turn")
                 move = self.black_strat.get_move(game_state)
 
-            sleep(1)  # uncomment to slow down the simulation
+            # sleep(1)  # uncomment to slow down the simulation
 
             # start new round
             print(
-                f"Starting new round with move {move} and player"
-                f" {game_state.get_current_player()}"
+                f"Starting round {game_state.get_round_number()} with move "
+                f"{move} and player {game_state.get_current_player()}"
             )
             game_state.start_new_round(move)
 

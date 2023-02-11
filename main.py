@@ -2,7 +2,10 @@ from assignment_1.simulator import ChessSimulator
 
 
 if __name__ == "__main__":
-    simulator = ChessSimulator()
+    simulator = ChessSimulator(parallelize=True)
 
     # Run the simulator.
-    simulator.run(n=1)
+    simulator.run(n=500)
+
+    # Print the game history.
+    print(simulator.get_game_history())
