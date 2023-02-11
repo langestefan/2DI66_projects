@@ -73,7 +73,6 @@ class TestClientPieces:
         """
         empty_board = create_empty_board.get_board()
         assert (empty_board == None).all()  # noqa: E711
-        print(f"empty_board: \n{create_empty_board}")
 
         for piece in create_pieces:
             # put piece on board
@@ -84,7 +83,9 @@ class TestClientPieces:
                 ignore_pos_check=True,
                 do_consistency_check=True,
             )
+            empty_board = create_empty_board.get_board()
             valid_moves_piece = piece.get_valid_moves(empty_board)
+            print(f"valid_moves_piece: \n{valid_moves_piece}")
             ascii_brd = piece.draw_valid_moves(empty_board, valid_moves_piece)
             print(f"ascii_board: \n{ascii_brd}")
             # assert type(valid_moves_piece) is np.ndarray

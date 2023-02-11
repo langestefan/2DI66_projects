@@ -19,7 +19,7 @@ class Piece(ABC):
         self.position: np.ndarray = init_pos  # Position on the board.
         self.n_moves: int = 0  # The number of moves the piece can at max make.
         self.column_switch: bool = (
-            False  # Whether the piece can switch columns
+            True  # Whether the piece can switch columns
         )
         self.column_switch_count: int = 0  # Times the piece switched columns
         self.jump: bool = False  # Whether the piece can jump over other pieces
@@ -95,6 +95,8 @@ class Piece(ABC):
         y_new = np.delete(y_new, n_moves_d)  # del old position (center of arr)
 
         vert = np.arange(1, n_moves_d + 1)
+        vert = np.concatenate((vert[::-1], vert))
+        assert len(vert) == len(y_new) == 2 * n_moves_d
 
         # white only moves up, never moves down
         if self.player == c.Players.WHITE:
@@ -104,7 +106,7 @@ class Piece(ABC):
         else:
             x_new = x_old + vert
 
-        x_new = np.tile(x_new, 2)
+        # x_new = np.tile(x_new, 2)
 
         move_cand[:, 2] = x_new
         move_cand[:, 3] = y_new
@@ -227,6 +229,9 @@ class Piece(ABC):
             # TODO: if king is in check we only allow moves that get him out
             # TODO: if move puts our king in check, it's not valid
             # TODO: check if we can jump over pieces
+
+        # delete all moves with -1
+        valid_moves = valid_moves[valid_moves[:, 0] != -1]
 
         return valid_moves
 
