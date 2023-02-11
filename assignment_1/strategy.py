@@ -32,12 +32,15 @@ class Strategy(ABC):
         # we will initialize the array with -1, so we can filter valid moves
         # format: [from_x, from_y, to_x, to_y]
         valid_moves = np.ones((100, 4), dtype=int) * -1
-        board_cpy = copy.copy(board)
+
+        # require board copy or not?
+        # board_cpy = copy.copy(board)
+        board_cpy = board.get_board()
 
         # go over all pieces of the player and get valid moves
         for i in range(c.BOARD_SIZE):
             for j in range(c.BOARD_SIZE):
-                piece = board_cpy[i, j]
+                piece = board_cpy[i, j]  # type: ignore
 
                 # some sanity checks
                 if piece is not None and piece.get_player() == self.player:
