@@ -27,7 +27,7 @@ class GameHistory:
             str += f"\n Round number: {game_run.get_round_number()}"
 
         return str
-            
+
     def add_game_run(self, game_run):
         """
         Adds a game run to the game runs.
@@ -59,11 +59,11 @@ class Simulator(ABC):
     A base class to represent a simulator.
     """
 
-    def __init__(self, parallelize: bool):
+    def __init__(self, parallelize: bool, n_jobs: int):
         super().__init__()
         self.game_history: GameHistory = GameHistory()
         self.parallelize = parallelize
-        self.n_jobs = mp.cpu_count()//2
+        self.n_jobs: int = n_jobs
 
     def get_game_history(self) -> GameHistory:
         """
@@ -73,8 +73,7 @@ class Simulator(ABC):
         """
         if self.game_history is None:
             raise ValueError(
-                "Game history is not initialized. Did you call"
-                " run()?"
+                "Game history is not initialized. Did you call run()?"
             )
         return self.game_history
 
@@ -127,22 +126,16 @@ class ChessSimulator(Simulator):
     Implements the chess specific simulator.
     """
 
-    def __init__(self, parallelize: bool = False):
-        super().__init__(parallelize=parallelize)
+    def __init__(self, parallelize: bool = False, n_jobs: int = 1):
+        super().__init__(parallelize=parallelize, n_jobs=n_jobs)
         self.white_strat = RandomStrategy(player=c.Players.WHITE)
         self.black_strat = RandomStrategy(player=c.Players.BLACK)
 
     def _do_one_run(self, n: int) -> GameState:
-        """
-        Runs one full game from start to win/draw.
-
-        :return: The final game state.
-        """
         game_state = GameState()
 
         # run the game until it is over, then return the final game state obj
         while game_state.get_game_state() == c.GameStates.ONGOING:
-            
             # break for testing purposes
             if game_state.get_round_number() > 10:
                 break
