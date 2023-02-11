@@ -38,10 +38,11 @@ class ChessBoard:
     This class is used to manage a chess board.
     """
 
-    def __init__(self):
+    def __init__(self, init_pieces: bool = True):
         # Create the board with initial positions.
         self.board = np.ndarray((c.BOARD_SIZE, c.BOARD_SIZE), dtype=p.Piece)
-        self.__create_initial_board(c.PIECES)
+        if init_pieces:
+            self.__create_initial_board(c.PIECES)
 
     def __str__(self):
         """Returns a string representation of the board."""
@@ -65,21 +66,52 @@ class ChessBoard:
         board_cpy = self.board.copy()
         return board_cpy
 
-    def __put_new_piece_on_board(self, piece: p.Piece, position: np.ndarray):
+    def put_new_piece_on_board(
+        self,
+        piece: p.Piece,
+        position: np.ndarray,
+        overwrite: bool = False,
+        ignore_pos_check: bool = False,
+        do_consistency_check: bool = False,
+    ):
         """
         Put a new piece on the board.
 
         :param piece: The piece to create.
         :param position: The position to set the piece on.
-        :param null_old_pos: If True, the old pos of the piece will be None.
+        :param overwrite: If True, overwrite the piece on the position.
+        :param ignore_pos_check: Ignore check if piece is already on this pos.
         :return: Updated board with the piece on the new position.
         """
         # check if the position is None
-        if self.board[position[0]][position[1]] is not None:
-            raise ValueError("Invalid position, already a piece here.")
+        if self.board[position[0]][position[1]] is not None and not overwrite:
+            raise ValueError(
+                "Invalid position, already a piece here and overwrite is"
+                " False."
+            )
 
         self.board[position[0]][position[1]] = piece
-        piece.set_position(position)
+        piece.set_position(position, ignore_pos_check=ignore_pos_check)
+
+        if do_consistency_check:
+            if not self.__board_consistency_check():
+                raise ValueError(
+                    "Board positions are not consistent with piece positions."
+                )
+
+    def __board_consistency_check(self):
+        """
+        Checks if the board is consistent.
+
+        :return: True if the board is consistent, False otherwise.
+        """
+        for i in range(c.BOARD_SIZE):
+            for j in range(c.BOARD_SIZE):
+                if self.board[i][j] is not None:
+                    if not np.array_equal(self.board[i][j].position, [i, j]):
+                        return False
+
+        return True
 
     def __create_initial_board(self, pieces: dict):
         """
@@ -102,8 +134,10 @@ class ChessBoard:
                 piece_obj = self.__return_piece_obj(piece)
 
                 # update the position on the board and the piece object
-                self.__put_new_piece_on_board(
-                    piece=piece_obj, position=piece["pos"]
+                self.put_new_piece_on_board(
+                    piece=piece_obj,
+                    position=piece["pos"],
+                    do_consistency_check=True,
                 )
 
     def __return_piece_obj(self, piece: dict):
