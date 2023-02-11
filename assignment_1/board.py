@@ -165,7 +165,7 @@ class ChessBoard:
         else:
             raise ValueError("Invalid piece type.")
 
-    def get_board(self) -> np.ndarray:
+    def get_board_arr(self) -> np.ndarray:
         """
         Returns a copy of the board.
         :return: The board.
@@ -208,8 +208,8 @@ class ChessBoard:
         print_info: bool = True,
     ):
         """
-        Moves a piece from one position to another. Note that we do not check
-        if the move is valid. This is done in the strategy class.
+        Moves a piece from one position to another. Note that we only do a
+        few sanity checks here to make sure the move is valid.
 
         :param old_pos: Old position of the piece.
         :param new_pos: New position of the piece.
@@ -237,10 +237,20 @@ class ChessBoard:
 
         # check if new pos is None, check if the piece is the same color
         if new_pos_cont is not None:
-            if new_pos_cont.get_player() == player:
+            if new_pos_cont.get_player() == player:  # type: ignore
                 raise ValueError("Invalid move, same color piece here.")
             elif print_info:
                 print(f"Player {player} captured the piece: {new_pos_cont.name}")  # type: ignore
+
+        # check if it's the first move for the pawn
+        if type(piece) == p.Pawn:  # type: ignore
+            if piece.is_first_move():  # type: ignore
+                piece.set_first_move_false()  # type: ignore
+
+            elif np.abs(new_pos[0] - old_pos[0]) > 1:
+                raise ValueError(
+                    "Invalid move, pawn can only move 2 spaces on first move."
+                )
 
         # update the board, move the piece
         self.board[new_pos[0]][new_pos[1]] = piece

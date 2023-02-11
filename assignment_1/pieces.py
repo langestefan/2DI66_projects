@@ -18,9 +18,7 @@ class Piece(ABC):
         self.name = "Piece"  # Placeholder name for debug, should not be used.
         self.position: np.ndarray = init_pos  # Position on the board.
         self.n_moves: int = 0  # The number of moves the piece can at max make.
-        self.column_switch: bool = (
-            True  # Whether the piece can switch columns
-        )
+        self.column_switch: bool = True  # Whether the piece can switch columns
         self.column_switch_count: int = 0  # Times the piece switched columns
         self.jump: bool = False  # Whether the piece can jump over other pieces
         self.symbol: str = "*"  # Symbol used to represent the piece.
@@ -76,7 +74,7 @@ class Piece(ABC):
         # get coordinates of start position for new moves
         x_old = old_loc[0][0]
         y_old = old_loc[0][1]
-            
+
         return x_old, y_old, move_cand
 
     def _get_diagonal_moves(
@@ -88,7 +86,7 @@ class Piece(ABC):
         :param n_moves_dir: Nr. of moves in one direction.
         :return: A list of diagonal moves for the piece.
         """
-        
+
         x_old, y_old, move_cand = self._init_move_cand(2 * n_moves_d)
 
         # y_new (columns) does not depend on whether it is white or black
@@ -116,7 +114,7 @@ class Piece(ABC):
         self,
         n_moves_d: int = c.BOARD_SIZE - 1,
         hor: bool = True,
-        ver: bool = True
+        ver: bool = True,
     ) -> np.ndarray:
         """
         Returns a list of vertical moves for the piece.
@@ -134,7 +132,7 @@ class Piece(ABC):
             n_moves += n_moves_d
         if n_moves == 0:
             raise ValueError("At least one direction must be True.")
-            
+
         x_old, y_old, move_cand = self._init_move_cand(n_moves)
 
         # generate horizontal moves, does not depend on player
@@ -156,7 +154,7 @@ class Piece(ABC):
 
             if hor:
                 start_idx = 2 * n_moves_d
-                
+
             move_cand[start_idx : start_idx + len(x_new), 2] = x_new
             move_cand[start_idx : start_idx + len(x_new), 3] = y_old
 
@@ -226,10 +224,15 @@ class Piece(ABC):
                 valid_moves[i, :] = -1
                 continue
 
+            # check if our own piece is present at target position
+            if board[x][y] is not None and board[x][y].get_player() == self.player:  # type: ignore
+                valid_moves[i, :] = -1
+                continue
+
             # TODO: if king is in check we only allow moves that get him out
             # TODO: if move puts our king in check, it's not valid
             # TODO: check if we can jump over pieces
-            # TODO: check if a player's own piece is present 
+            # TODO: check if it's the pawn's first move and allow double step
 
         # delete all moves with -1
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
@@ -239,28 +242,28 @@ class Piece(ABC):
 
 class Pawn(Piece):
     def __init__(
-        self, player: c.Players, init_pos=np.array([-1, -1], dtype=int),
-        extra_step=True
+        self, player: c.Players, init_pos=np.array([-1, -1], dtype=int)
     ):
         super().__init__(player, init_pos)
         self.name = "Pawn"
         self.symbol = "P"
-        
+
         # note that this is for one pawn and excluding double step at beginning
-        self.n_moves = 3 + int(extra_step) 
-        
-        self.extra_step = extra_step
-        
+        self.extra_step = True
+        self.n_moves = 3 + int(self.extra_step)
+
     def __move_pawn(
         self, x_old: int, y_old: int, move_cand: np.ndarray
     ) -> np.ndarray:
         """
-        Returns the coordinates of pawn moves 
+        Returns the coordinates of pawn moves
         """
-        # get all possible moves 
-        x_new = [x_old-1]*(self.n_moves-1) + [x_old-2]*int(self.extra_step)
+        # get all possible moves
+        x_new = [x_old - 1] * (self.n_moves - 1) + [x_old - 2] * int(
+            self.extra_step
+        )
         x_new = np.array(x_new)
-        y_new = [y_old, y_old-1, y_old+1] + [y_old]*int(self.extra_step)
+        y_new = [y_old, y_old - 1, y_old + 1] + [y_old] * int(self.extra_step)
         y_new = np.array(y_new)
 
         # if player is black, we need to mirror the row coordinates
@@ -272,11 +275,23 @@ class Pawn(Piece):
 
         return move_cand
 
+    def is_first_move(self) -> bool:
+        """
+        Check if the pawn is in starting position and can make a double step.
+        """
+        return self.extra_step
+
+    def set_first_move_false(self):
+        """
+        Set the first move flag to false.
+        """
+        self.extra_step = False
+
     def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
         valid_moves = np.ones((1, 4), dtype=int) * -1
-        
+
         x_old, y_old, move_cand = super()._init_move_cand(self.n_moves)
-        
+
         # get coordinates of all new moves, valid or not
         move_cand = self.__move_pawn(x_old, y_old, move_cand)
 
@@ -340,7 +355,7 @@ class Knight(Piece):
 
         # get coordinates of all new moves, valid or not
         move_cand = self.__move_l_shape(x_old, y_old, move_cand)
-        
+
         # check which move candidates are valid and filter them out
         valid_moves = super().validate_moves(move_cand, board)
 

@@ -1,10 +1,10 @@
-import numpy as np
 from abc import ABC, abstractmethod
 import multiprocessing as mp
-from functools import partial
+from time import sleep
 
 import assignment_1.constants as c
 from assignment_1.game_state import GameState
+from assignment_1.strategy import RandomStrategy
 
 
 class GameHistory:
@@ -52,7 +52,7 @@ class Simulator(ABC):
 
     def __init__(self, parallelize: bool = False):
         super().__init__()
-        self.game_history = None
+        self.game_history: GameHistory = GameHistory()
         self.parallelize = parallelize
 
     def get_game_history(self) -> GameHistory:
@@ -61,59 +61,49 @@ class Simulator(ABC):
 
         :return: The game history.
         """
+        if self.game_history is None:
+            raise ValueError(
+                "Game history is not initialized. Did you call"
+                " start_simulation()?"
+            )
         return self.game_history
 
-    def start_simulation(self, n: int) -> None:
+    def run(self, n: int) -> None:
         """
         Starts the simulation.
 
         :param n: The number of simulation runs to perform.
         """
-        self.game_history = GameHistory()
-        self.__do_n_runs(n, self.parallelize)
+        # the results of the simulation runs will be written to the game history
+        self.__do_n_runs(n, self.game_history, self.parallelize)
 
-    def __do_n_runs(self, n: int, parallelize: bool = False) -> None:
+    def __do_n_runs(
+        self,
+        n: int,
+        game_history: GameHistory,
+        parallelize: bool = False,
+    ) -> None:
         """
         Runs n simulations.
 
         :param n: The number of simulation runs to perform.
         :param parallelize: Whether to parallelize the simulation.
         """
+        # if parallelization is enabled, use multiprocessing
         if parallelize:
-            results = self.__do_n_runs_parallel(n)
+            with mp.Pool() as pool:
+                results = pool.map(self._do_one_run, range(n))  # type: ignore
+
+                # add the results to the game history
+                for result in results:
+                    game_history.add_game_run(result)
         else:
-            results = self.__do_n_runs_sequential(n)
-
-        return results
-
-    def __do_n_runs_parallel(self, n: int) -> None:
-        """
-        Runs n simulations in parallel.
-
-        :param n: The number of simulation runs to perform.
-
-        :return: A list of results.
-        """
-        results = []
-        with mp.Pool() as pool:
-            results = pool.map(self.do_one_run, range(n))
-        return results
-
-    def __do_n_runs_sequential(self, n: int) -> None:
-        """
-        Runs n simulations sequentially.
-
-        :param n: The number of simulation runs to perform.
-
-        :return: A list of results.
-        """
-        results = []
-        for i in range(n):
-            results.append(self.do_one_run())
-        return results
+            for i in range(n):
+                result = self._do_one_run()
+                game_history.add_game_run(result)
 
     @abstractmethod
-    def do_one_run(self) -> None:
+    def _do_one_run(self) -> None:
         """
         Runs one game.
         """
@@ -126,17 +116,35 @@ class ChessSimulator(Simulator):
     """
 
     def __init__(self):
-        self.game_history = GameHistory()
+        super().__init__()
+        self.white_strat = RandomStrategy(player=c.Players.WHITE)
+        self.black_strat = RandomStrategy(player=c.Players.BLACK)
 
-    def do_one_run(self) -> GameState:
+    def _do_one_run(self) -> GameState:
         """
-        Runs one game.
+        Runs one full game from start to win/draw.
 
         :return: The final game state.
         """
         game_state = GameState()
-        while game_state.get_game_state() == c.game_states["ongoing"]:
-            game_state = game_state.get_next_state()
 
-        self.game_history.add_game_run(game_state)
+        # run the game until it is over, then return the final game state obj
+        while game_state.get_game_state() == c.GameStates.ONGOING:
+            game_state.increment_round_number()
+            if game_state.get_current_player() == c.Players.WHITE:
+                print("White's turn")
+                move = self.white_strat.get_move(game_state)
+            else:
+                print("Black's turn")
+                move = self.black_strat.get_move(game_state)
+
+            sleep(1)  # uncomment to slow down the simulation
+
+            # start new round
+            print(
+                f"Starting new round with move {move} and player"
+                f" {game_state.get_current_player()}"
+            )
+            game_state.start_new_round(move)
+
         return game_state

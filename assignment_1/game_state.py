@@ -1,7 +1,7 @@
-# import numpy as np
+import numpy as np
+
 import assignment_1.constants as c
 from assignment_1.board import ChessBoard
-from assignment_1.strategy import RandomStrategy
 
 
 class GameState:
@@ -21,20 +21,20 @@ class GameState:
      - The game is over when one player has no pieces left or when the
        king is captured.
 
-
+    Attributes:
+        round_number (int): The round number of the game.
+        current_player (Players): The player who is currently playing.
+        game_state (GameStates): The game state. Ongoing, draw or won.
+        chess_board (ChessBoard): The chess board. NxN ndarray.
     """
 
     def __init__(self):
-        self.round_number: int = 0
+        self.round_number: int = -1  # Call start_new_round() to increment to 0
         self.current_player: c.Players = c.Players.WHITE  # White starts
         self.game_state: c.GameStates = c.GameStates.ONGOING
+        self.chess_board: ChessBoard = ChessBoard(init_pieces=True)
 
     def __str__(self) -> str:
-        """
-        Returns a string representation of the game state.
-
-        :return: A string representation of the game state.
-        """
         return f"Round number: {self.round_number}"
 
     def get_round_number(self) -> int:
@@ -45,7 +45,7 @@ class GameState:
         """
         return self.round_number
 
-    def get_player(self) -> c.Players:
+    def get_current_player(self) -> c.Players:
         """
         Returns the player who is currently playing.
 
@@ -53,12 +53,35 @@ class GameState:
         """
         return self.current_player
 
-    def start_new_round(self):
+    def increment_round_number(self) -> None:
         """
-        Starts a new round.
+        Increments the round number.
         """
+        # start new round, increment round number and set current player
         self.round_number += 1
         self.current_player = c.Players(self.round_number % 2)
+
+    def start_new_round(self, move: np.ndarray) -> None:
+        """
+        Starts a new round.
+
+        :param move: Move to be made.
+        """
+        if move.shape == (1, 4):
+            move = move.squeeze()
+        if move.shape != (4,):
+            raise ValueError("Move must be a 4 element array.")
+
+        print(
+            f"Round {self.round_number} started. Now playing:"
+            f" {self.current_player}"
+        )
+        print(f"Move: {move}")
+
+        # make move
+        old_pos = move[0:2]
+        new_pos = move[2:4]
+        self.chess_board.move_piece(old_pos, new_pos, self.current_player)
 
     def get_game_state(self) -> c.GameStates:
         """
@@ -68,54 +91,10 @@ class GameState:
         """
         return self.game_state
 
-    def set_new_game_state(self, board: ChessBoard):
+    def get_board(self) -> ChessBoard:
         """
-        Updates the game state based on the current board and the current game
-        state. If the game is over, the game state is updated accordingly.
+        Returns the chess board.
 
-        :param board: The current board.
-
-        :raises Exception: If the game is already over and we set a new state.
+        :return: The chess board.
         """
-        # raise exception if game is already over
-        if self.game_state != c.GameStates.ONGOING:
-            raise Exception("Game is already over.")
-
-        # checkmate: no valid moves available and king is in check
-        if (
-            self.__check_if_king_is_in_check(board, self.current_player)
-            and len(self.__get_all_valid_moves(board, self.current_player))
-            == 0
-        ):
-            if self.current_player == c.Players.WHITE:
-                self.game_state = c.GameStates.BLACK_WON
-            else:
-                self.game_state = c.GameStates.WHITE_WON
-
-        # stalemate: no valid moves available, but king is not in check
-        elif (
-            not self.__check_if_king_is_in_check(board, self.current_player)
-            and len(self.__get_all_valid_moves(board, self.current_player))
-            == 0
-        ):
-            self.game_state = c.GameStates.DRAW
-
-        # if nobody wins and the game is not a draw, the game is still ongoing
-        else:
-            self.game_state = c.GameStates.ONGOING
-
-    def __get_all_valid_moves(
-        self, board: ChessBoard, player: c.Players
-    ) -> list:
-        valid_moves = board.get_valid_moves(player)
-        return valid_moves
-
-    def __check_if_king_is_in_check(
-        self, board: ChessBoard, player: c.Players
-    ) -> bool:
-        """
-        Checks if the king is in check.
-
-        :return: True if the king is in check, False otherwise.
-        """
-        return True
+        return self.chess_board
