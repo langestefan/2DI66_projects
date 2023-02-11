@@ -20,8 +20,11 @@ class TestClientGameState:
         Tests if the board is created correctly.
         """
         assert create_board is not None
-        assert create_board.get_board() is not None
-        assert create_board.get_board().shape == (c.BOARD_SIZE, c.BOARD_SIZE)
+        assert create_board.get_board_arr() is not None
+        assert create_board.get_board_arr().shape == (
+            c.BOARD_SIZE,
+            c.BOARD_SIZE,
+        )
 
     def test_board_get_piece(self, create_board):
         """

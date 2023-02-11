@@ -63,7 +63,7 @@ class TestClientPieces:
         """
         Tests if moves are retrieved. Moves may not be valid and then len=0.
         """
-        board = create_board.get_board()
+        board = create_board.get_board_arr()
         for piece in create_pieces:
             assert type(piece.get_valid_moves(board)) is np.ndarray
 
@@ -71,7 +71,7 @@ class TestClientPieces:
         """
         Tests if valid moves are retrieved.
         """
-        empty_board = create_empty_board.get_board()
+        empty_board = create_empty_board.get_board_arr()
         assert (empty_board == None).all()  # noqa: E711
 
         for piece in create_pieces:
@@ -83,11 +83,8 @@ class TestClientPieces:
                 ignore_pos_check=True,
                 do_consistency_check=True,
             )
-            empty_board = create_empty_board.get_board()
+            empty_board = create_empty_board.get_board_arr()
             valid_moves_piece = piece.get_valid_moves(empty_board)
-            print(f"valid_moves_piece: \n{valid_moves_piece}")
+            # print(f"valid_moves_piece: \n{valid_moves_piece}")
             ascii_brd = piece.draw_valid_moves(empty_board, valid_moves_piece)
             print(f"ascii_board: \n{ascii_brd}")
-            # assert type(valid_moves_piece) is np.ndarray
-            # assert valid_moves_piece.shape[1] == 4
-            # assert len(valid_moves_piece) > 0
