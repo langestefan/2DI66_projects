@@ -1,9 +1,8 @@
-# to enable parent directory imports
+import pytest
 import sys, os
 
+# to enable parent directory imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import pytest
 
 
 # Mark the test root directory
