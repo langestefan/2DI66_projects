@@ -12,7 +12,7 @@ class TestClientPieces:
         """
         Creates a piece object.
         """
-        init_pos = np.array([4, 2])  # center, first row of white
+        init_pos = np.array([2, 2])  # center, first row of white
         return (
             Pawn(c.Players.WHITE, init_pos=init_pos),
             Rook(c.Players.WHITE, init_pos=init_pos),

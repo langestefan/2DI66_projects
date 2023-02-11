@@ -106,8 +106,6 @@ class Piece(ABC):
         else:
             x_new = x_old + vert
 
-        # x_new = np.tile(x_new, 2)
-
         move_cand[:, 2] = x_new
         move_cand[:, 3] = y_new
 
