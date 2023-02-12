@@ -197,12 +197,13 @@ class Piece(ABC):
             for j in range(c.BOARD_SIZE):
                 if board[i][j] is None:
                     s += " ."
-                elif board[i][j] == self:
-                    symbol = f" {self.symbol}"
-                    symbol = c.bcolors.OKBLUE + symbol + c.bcolors.ENDC
-                    s += symbol
                 elif board[i][j] == 1:
                     s += " x"
+                else:
+                    symbol = f" {board[i][j].symbol}"
+                    print(f"board[{i}][{j}] = {board[i][j]}")
+                    symbol = c.bcolors.OKBLUE + symbol + c.bcolors.ENDC
+                    s += symbol
 
             s += "\n"
         return "\n" + s
@@ -239,8 +240,6 @@ class Piece(ABC):
                 valid_moves[i, :] = -1
                 piece_enc = True
                 continue
-
-            # TODO: if move puts our king in check, it's not valid
 
             # additional checks for pawn
             if self.name == "Pawn":

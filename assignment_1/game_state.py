@@ -136,21 +136,27 @@ class GameState:
                         # we check if any of the moves puts the king in check
                         if isinstance(piece, King):
                             for idx, move in enumerate(moves):
-                                print(f"Checking move: {move} for player: {player}.")
+                                print(
+                                    f"Checking move: {move} for player:"
+                                    f" {player}."
+                                )
                                 # copy the game state (myself)
                                 gs_cpy = copy.deepcopy(self)
                                 gs_cpy.current_player = player
 
                                 # make the move
                                 gs_cpy.chess_board.move_piece(
-                                    move[0:2], move[2:4], player, print_info=False
+                                    move[0:2],
+                                    move[2:4],
+                                    player,
+                                    print_info=False,
                                 )
 
                                 # check if the king is in check
                                 if gs_cpy.king_is_in_check(player, [move]):
                                     # remove the move from the valid moves
                                     moves[idx] = -1
-                                    print("Puts king in check. Removing move.")
+                                    print("Puts king in check.")
 
                                 # delete the copy
                                 del gs_cpy
@@ -162,8 +168,12 @@ class GameState:
                         move_index += len(moves)
 
         # our king is in check, so we need to check if we can get out of check
-        else:
-            # we are in check, so we need to check if we can get out of check
+        elif (
+            self.check_state == c.CheckStates.WHITE_IN_CHECK
+            and player == c.Players.WHITE
+            or self.check_state == c.CheckStates.BLACK_IN_CHECK
+            and player == c.Players.BLACK
+        ):
             # first we need to get the king position
             king_pos = self.chess_board.get_piece_loc_by_type(
                 piece_type=King, player=player
@@ -178,6 +188,10 @@ class GameState:
             # get all valid moves for the king
             king_moves = king.get_valid_moves(board_arr)
             valid_moves = king_moves
+
+        else:
+            # the king is in check, but it is not the current player's turn
+            raise ValueError("It is not the current player's turn.")
 
         # filter out invalid moves
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
@@ -207,7 +221,7 @@ class GameState:
             if (move[2:4] == king_pos).all():
                 in_check = True
                 break
-        
+
         # a player's king is now in check
         if in_check:
             if player == c.Players.WHITE:

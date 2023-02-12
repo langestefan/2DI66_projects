@@ -1,10 +1,9 @@
-from conftest import Context as ctx
-import assignment_1.constants as c
-
+import numpy as np
 import pytest
 
-
+import assignment_1.constants as c
 from assignment_1.simulator import ChessSimulator
+from assignment_1.board import ChessBoard
 
 
 class TestSimulator:
@@ -14,6 +13,13 @@ class TestSimulator:
         Creates a game state object.
         """
         return ChessSimulator()
+
+    @pytest.fixture(autouse=True)
+    def create_empty_board(self):
+        """
+        Creates a chess board object
+        """
+        return ChessBoard(init_pieces=False)
 
     def test_simulator_init(self, create_simulator):
         """

@@ -33,10 +33,11 @@ class RandomStrategy(Strategy):
 
         # first we check if our king is in check by checking opponent's valid moves
         opponent = c.Players((self.player.value + 1) % 2)
+        print(f"opponent: {opponent}")
         valid_moves = game_state.get_valid_moves(opponent)
         king_in_check = game_state.king_is_in_check(self.player, valid_moves)
         if king_in_check:
-            print(f'King of player {self.player} is in check!')
+            print(f"King of player {self.player} is in check!")
 
         # get a list of valid moves
         valid_moves = game_state.get_valid_moves(self.player)

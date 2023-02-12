@@ -49,18 +49,12 @@ class ChessBoard:
         if init_pieces:
             self.__create_initial_board(c.PIECES)
 
-        self.old_pos = None
-        self.new_pos = None
-
     def __str__(self):
         """Returns a string representation of the board."""
         s = ""
         for i in range(c.BOARD_SIZE):
+            s += f"{i} "
             for j in range(c.BOARD_SIZE):
-
-                if self.old_pos is not None and self.old_pos[0] == i and self.old_pos[1] == j:
-                    s += c.bcolors.WARNING + " X" + c.bcolors.ENDC
-                    continue
 
                 if self.board[i][j] is None:
                     s += " ."
@@ -68,16 +62,13 @@ class ChessBoard:
                     symbol = f" {self.board[i][j].symbol}"
                     if self.board[i][j].player is c.Players.WHITE:
                         symbol = c.bcolors.OKBLUE + symbol
-                    
-                    elif self.new_pos is not None and self.new_pos[0] == i and self.new_pos[1] == j:
-                        symbol = c.bcolors.WARNING + symbol
                     else:
                         symbol = c.bcolors.FAIL + symbol
-
 
                     s += symbol + c.bcolors.ENDC
 
             s += "\n"
+        s += "   0 1 2 3 4"
 
         return "\n" + s
 
@@ -310,6 +301,4 @@ class ChessBoard:
 
         # only for debugging
         if print_info:
-            self.old_pos = old_pos
-            self.new_pos = new_pos
             print(self)

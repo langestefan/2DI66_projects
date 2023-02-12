@@ -7,7 +7,7 @@ if __name__ == "__main__":
     simulator = ChessSimulator(parallelize=True, n_jobs=mp.cpu_count() // 2)
 
     # Run the simulator.
-    simulator.run(n=500)
+    simulator.run(n=1)
 
     # Print the game history.
     print(simulator.get_game_history())
