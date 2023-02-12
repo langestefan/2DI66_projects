@@ -2,6 +2,11 @@ from enum import Enum
 import numpy as np
 
 
+n_players = 2
+n_pieces = 10
+BOARD_SIZE = 5
+
+
 # Game states: 0 = ongoing, 1 = player 1 won, 2 = player 2 won, 3 = draw
 # game_states = {"ongoing": 0, "player_1_won": 1, "player_2_won": 2, "draw": 3}
 class GameStates(Enum):
@@ -11,9 +16,10 @@ class GameStates(Enum):
     DRAW = 3
 
 
-n_players = 2
-n_pieces = 10
-BOARD_SIZE = 5
+class CheckStates(Enum):
+    NONE = 0
+    WHITE_IN_CHECK = 1
+    BLACK_IN_CHECK = 2
 
 
 # Player definitions:

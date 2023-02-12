@@ -30,14 +30,18 @@ class TestClientGameState:
         """
         Tests if the correct piece is retrieved.
         """
-        assert create_board.get_piece([0, 0]) is not None
-        assert create_board.get_piece([0, 0]).name == "King"
-        assert create_board.get_piece([0, 0]).player == c.Players.BLACK
-        assert create_board.get_piece([4, 4]) is not None
-        assert create_board.get_piece([4, 4]).name == "King"
-        assert create_board.get_piece([4, 4]).player == c.Players.WHITE
+        assert create_board.get_piece(np.array([0, 0])) is not None
+        assert create_board.get_piece(np.array([0, 0])).name == "King"
+        assert (
+            create_board.get_piece(np.array([0, 0])).player == c.Players.BLACK
+        )
+        assert create_board.get_piece(np.array([4, 4])) is not None
+        assert create_board.get_piece(np.array([4, 4])).name == "King"
+        assert (
+            create_board.get_piece(np.array([4, 4])).player == c.Players.WHITE
+        )
         for i in range(5):
-            assert create_board.get_piece([2, i]) is None
+            assert create_board.get_piece(np.array([2, i])) is None
 
     def test_board_print_board(self, create_board):
         """
@@ -83,3 +87,23 @@ class TestClientGameState:
         assert board_copy[0, 0] is not None
         assert board_copy[0, 0].name == "King"
         assert board_copy[0, 0].player == c.Players.BLACK
+
+    def test_get_piece_loc_by_type(self, create_board):
+        """
+        Tests if the correct piece location is retrieved.
+        """
+        piece_loc = create_board.get_piece_loc_by_type(King, c.Players.WHITE)
+        assert (piece_loc != None).all()  # noqa: E711
+        assert len(piece_loc) == 1
+
+        piece_loc = create_board.get_piece_loc_by_type(King, c.Players.BLACK)
+        assert (piece_loc != None).all()  # noqa: E711
+        assert len(piece_loc) == 1
+
+        piece_loc = create_board.get_piece_loc_by_type(Pawn, c.Players.WHITE)
+        assert (piece_loc != None).all()  # noqa: E711
+        assert len(piece_loc) == 5
+
+        piece_loc = create_board.get_piece_loc_by_type(Pawn, c.Players.BLACK)
+        assert (piece_loc != None).all()  # noqa: E711
+        assert len(piece_loc) == 5

@@ -26,8 +26,10 @@ class TestClientGameState:
         """
         Tests if the round number is incremented correctly.
         """
+        create_game_state.increment_round_number()
         create_game_state.start_new_round(move=np.array([4, 4, 2, 2]))
         assert create_game_state.get_current_player() == c.Players.WHITE
+        create_game_state.increment_round_number()
         create_game_state.start_new_round(move=np.array([0, 0, 2, 3]))
         assert create_game_state.get_round_number() == 1
         assert create_game_state.get_current_player() == c.Players.BLACK

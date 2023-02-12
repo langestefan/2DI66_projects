@@ -136,10 +136,7 @@ class ChessSimulator(Simulator):
 
         # run the game until it is over, then return the final game state obj
         while game_state.get_game_state() == c.GameStates.ONGOING:
-            # break for testing purposes
-            if game_state.get_round_number() > 10:
-                break
-
+            print("\n--------------------------------------------\n")
             # increment the round number
             game_state.increment_round_number()
 
@@ -150,12 +147,14 @@ class ChessSimulator(Simulator):
                 print("Black's turn")
                 move = self.black_strat.get_move(game_state)
 
-            # sleep(1)  # uncomment to slow down the simulation
+            # move is none, game is over so we break the loop
+            if move is None:
+                break
 
             # start new round
             print(
-                f"Starting round {game_state.get_round_number()} with move "
-                f"{move} and player {game_state.get_current_player()}"
+                f"Round {game_state.get_round_number()}; Move: "
+                f"{move} and {game_state.get_current_player()}"
             )
             game_state.start_new_round(move)
 

@@ -1,6 +1,9 @@
+import numpy as np
+from typing import Type, TypeVar
+
 import assignment_1.constants as c
 import assignment_1.pieces as p
-import numpy as np
+
 
 # Classic baby chess board representation:
 #   -------------
@@ -32,6 +35,8 @@ import numpy as np
 #      Columns
 # Where white pieces are uppercase and black pieces are lowercase.
 
+TPieces = TypeVar("TPieces", bound=p.Piece)
+
 
 class ChessBoard:
     """
@@ -44,22 +49,36 @@ class ChessBoard:
         if init_pieces:
             self.__create_initial_board(c.PIECES)
 
+        self.old_pos = None
+        self.new_pos = None
+
     def __str__(self):
         """Returns a string representation of the board."""
         s = ""
         for i in range(c.BOARD_SIZE):
             for j in range(c.BOARD_SIZE):
+
+                if self.old_pos is not None and self.old_pos[0] == i and self.old_pos[1] == j:
+                    s += c.bcolors.WARNING + " X" + c.bcolors.ENDC
+                    continue
+
                 if self.board[i][j] is None:
                     s += " ."
                 else:
                     symbol = f" {self.board[i][j].symbol}"
                     if self.board[i][j].player is c.Players.WHITE:
-                        symbol = c.bcolors.OKBLUE + symbol + c.bcolors.ENDC
+                        symbol = c.bcolors.OKBLUE + symbol
+                    
+                    elif self.new_pos is not None and self.new_pos[0] == i and self.new_pos[1] == j:
+                        symbol = c.bcolors.WARNING + symbol
                     else:
-                        symbol = c.bcolors.FAIL + symbol + c.bcolors.ENDC
-                    s += symbol
+                        symbol = c.bcolors.FAIL + symbol
+
+
+                    s += symbol + c.bcolors.ENDC
 
             s += "\n"
+
         return "\n" + s
 
     def __copy__(self):
@@ -196,8 +215,39 @@ class ChessBoard:
         :param col: The column of the piece.
         :return: A piece.
         """
+        pos = pos.squeeze()
         piece = self.board[pos[0]][pos[1]]
         return piece  # type: ignore
+
+    def get_piece_loc_by_type(
+        self, piece_type: Type[TPieces], player: c.Players
+    ) -> np.ndarray:
+        """
+        Returns the location of a piece of a given type for a given player.
+        :param piece_type: The type of the piece.
+        :param player: The player whose piece is being retrieved.
+        :return: A piece.
+        """
+        piece_locs = np.ones((10, 2), dtype=int) * -1
+
+        idx: int = 0
+        for i in range(c.BOARD_SIZE):
+            for j in range(c.BOARD_SIZE):
+                if (
+                    self.board[i][j] is not None
+                    and self.board[i][j].get_player() == player
+                    and type(self.board[i][j]) == piece_type
+                ):
+                    piece_locs[idx] = [i, j]
+                    idx += 1
+
+        # if idx == 0, then we didn't find any pieces of the given type
+        if idx == 0:
+            raise ValueError("No pieces of the given type found.")
+
+        # remove the empty rows
+        piece_locs = piece_locs[piece_locs != -1].reshape(-1, 2)
+        return piece_locs
 
     def move_piece(
         self,
@@ -258,5 +308,8 @@ class ChessBoard:
         if set_old_pos_to_none:
             self.board[old_pos[0]][old_pos[1]] = None
 
+        # only for debugging
         if print_info:
+            self.old_pos = old_pos
+            self.new_pos = new_pos
             print(self)
