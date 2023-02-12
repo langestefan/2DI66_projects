@@ -91,10 +91,12 @@ class Piece(ABC):
 
         # y_new (columns) does not depend on whether it is white or black
         y_new = np.arange(y_old - n_moves_d, y_old + n_moves_d + 1)
+        y_new[0:n_moves_d] = y_new[0:n_moves_d][::-1] # reverse order for jump check
         y_new = np.delete(y_new, n_moves_d)  # del old position (center of arr)
 
         vert = np.arange(1, n_moves_d + 1)
         vert = np.concatenate((vert[::-1], vert))
+        vert[0:n_moves_d] = vert[0:n_moves_d][::-1]
         assert len(vert) == len(y_new) == 2 * n_moves_d
 
         # white only moves up, never moves down
@@ -139,6 +141,8 @@ class Piece(ABC):
         if hor:
             y_new = np.arange(y_old - n_moves_d, y_old + n_moves_d + 1)
             y_new = np.delete(y_new, n_moves_d)
+            y_new[0:n_moves_d] = y_new[0:n_moves_d][::-1] # reverse order for jump check
+            
             x_new = np.repeat(x_old, 2 * n_moves_d)
             move_cand[0 : len(x_new), 2] = x_new
             move_cand[0 : len(x_new), 3] = y_new
@@ -146,6 +150,7 @@ class Piece(ABC):
         # generate vertical moves
         if ver:
             vert = np.arange(1, n_moves_d + 1)
+            
             if self.player == c.Players.WHITE:
                 x_new = x_old - vert
             else:
@@ -209,6 +214,7 @@ class Piece(ABC):
         :return: A list of valid moves for the piece.
         """
         valid_moves = moves.copy()
+        piece_enc = False 
 
         for i, move in enumerate(moves):
             x = move[2]  # row nr. of target position
@@ -227,12 +233,36 @@ class Piece(ABC):
             # check if our own piece is present at target position
             if board[x][y] is not None and board[x][y].get_player() == self.player:  # type: ignore
                 valid_moves[i, :] = -1
+                piece_enc = True 
                 continue
 
             # TODO: if king is in check we only allow moves that get him out
             # TODO: if move puts our king in check, it's not valid
-            # TODO: check if we can jump over pieces
-            # TODO: check if it's the pawn's first move and allow double step
+            
+            # additional checks for pawn 
+            if self.name == 'Pawn':
+                # check whether it's a diagonal move and opponent's piece is present
+                if abs(move[1] - move[3]) == 1 and board[x][y] is None:
+                    valid_moves[i, :] = -1
+                
+                # check whether it's a vertical move and opponent piece not present
+                elif move[1] == move[3] and board[x][y] is not None:
+                    valid_moves[i,:] = -1
+                    piece_enc = True
+                        
+            # check if an illegal jump move has been made 
+            if not self.jump:
+                # piece already encountered so invalid move: there's been a jump 
+                if piece_enc:
+                    valid_moves[i,:] = -1
+                    
+                # check whether a piece has been encountered 
+                elif board[x][y] is not None:
+                    piece_enc = True 
+                    
+                    # check whether it is the last move in one direction
+                    if i%(c.BOARD_SIZE-1) == (c.BOARD_SIZE-2):
+                        piece_enc = False
 
         # delete all moves with -1
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
