@@ -43,7 +43,7 @@ class TestClientGameState:
         assert create_game_state.get_round_number() == 1
         assert create_game_state.get_current_player() == c.Players.BLACK
 
-    def test_game_state_king_check(
+    def test_game_state_king_check_rook(
         self, create_empty_board, create_game_state
     ):
         """
@@ -80,10 +80,7 @@ class TestClientGameState:
         create_game_state.increment_round_number()
         print(f"Current player: {create_game_state.get_current_player()}")
         print(f"Current round: {create_game_state.get_round_number()}")
-        valid_moves_rook = create_game_state.get_valid_moves(
-            player=c.Players.BLACK
-        )
         king_in_check = create_game_state.king_is_in_check(
             player=c.Players.WHITE
         )
-        assert king_in_check == True
+        assert king_in_check is True

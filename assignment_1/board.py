@@ -307,6 +307,13 @@ class ChessBoard:
                     "Invalid move, pawn can only move 2 spaces on first move."
                 )
 
+        # check if the move switches columns
+        if new_pos[1] != old_pos[1]:
+            if piece.get_column_switch() is False:  # type: ignore
+                raise ValueError("Invalid move, piece cannot switch columns.")
+            else:
+                piece.increment_column_switch_count()  # type: ignore
+
         # update the board, move the piece
         self.board[new_pos[0]][new_pos[1]] = piece
         piece.set_position(new_pos)  # type: ignore

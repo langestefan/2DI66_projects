@@ -10,9 +10,6 @@ class Piece(ABC):
     :param player: The player who owns the piece.
     """
 
-    # def __init__(
-    #     self, player: c.Players, init_pos=np.array([-1, -1], dtype=int)
-    # ):
     def __init__(self, player: c.Players, init_pos: np.ndarray):
         self.player = player  # The player who owns the piece.
         self.name = "Piece"  # Placeholder name for debug, should not be used.
@@ -20,6 +17,9 @@ class Piece(ABC):
         self.n_moves: int = 0  # The number of moves the piece can at max make.
         self.column_switch: bool = True  # Whether the piece can switch columns
         self.column_switch_count: int = 0  # Times the piece switched columns
+        self.column_switch_max: int = (
+            5  # Max times the piece can switch columns
+        )
         self.jump: bool = False  # Whether the piece can jump over other pieces
         self.symbol: str = "*"  # Symbol used to represent the piece.
 
@@ -33,6 +33,24 @@ class Piece(ABC):
         :return: The player who owns the piece.
         """
         return self.player
+
+    def increment_column_switch_count(self):
+        """
+        Sets the column switch count of the piece.
+
+        :param count: The new column switch count.
+        """
+        self.column_switch_count += 1
+        if self.column_switch_count >= self.column_switch_max:
+            self.column_switch = False
+
+    def get_column_switch(self) -> int:
+        """
+        Returns whether the piece can switch columns.
+
+        :return: The column switch count of the piece.
+        """
+        return self.column_switch
 
     def get_name(self) -> str:
         """
@@ -170,7 +188,7 @@ class Piece(ABC):
         return move_cand
 
     @abstractmethod
-    def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
+    def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
         """
         Returns a list of valid moves for the piece.
 
@@ -208,9 +226,7 @@ class Piece(ABC):
             s += "\n"
         return "\n" + s
 
-    def validate_moves(
-        self, moves: np.ndarray, board: np.ndarray
-    ) -> np.ndarray:
+    def filter_moves(self, moves: np.ndarray, board: np.ndarray) -> np.ndarray:
         """
         Validates the moves gives moves for the piece.
 
@@ -245,7 +261,7 @@ class Piece(ABC):
             if self.name == "Pawn":
                 if piece_enc:
                     valid_moves[i, :] = -1
-                
+
                 # check whether it's a diagonal move and opponent's piece is present
                 if abs(move[1] - move[3]) == 1 and board[x][y] is None:
                     valid_moves[i, :] = -1
@@ -254,9 +270,9 @@ class Piece(ABC):
                 elif move[1] == move[3] and board[x][y] is not None:
                     valid_moves[i, :] = -1
                     piece_enc = True
-                        
+
             # check if an illegal jump move has been made
-            if not self.jump and self.name != 'Pawn' and self.name != 'King':
+            if not self.jump and self.name != "Pawn" and self.name != "King":
                 # piece already encountered so invalid move: there's been a jump
                 if piece_enc:
                     valid_moves[i, :] = -1
@@ -272,7 +288,10 @@ class Piece(ABC):
         # delete all moves with -1
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
 
-        print(f'Valid moves for {self.name} at {self.position} are: {valid_moves}')
+        # print(
+        #     f"Valid moves for {self.name} at {self.position} are:\n"
+        #     f" {valid_moves}"
+        # )
 
         return valid_moves
 
@@ -324,7 +343,7 @@ class Pawn(Piece):
         """
         self.extra_step = False
 
-    def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
+    def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
         valid_moves = np.ones((1, 4), dtype=int) * -1
 
         x_old, y_old, move_cand = super()._init_move_cand(self.n_moves)
@@ -333,7 +352,7 @@ class Pawn(Piece):
         move_cand = self.__move_pawn(x_old, y_old, move_cand)
 
         # check which move candidates are valid and filter them out
-        valid_moves = super().validate_moves(move_cand, board)
+        valid_moves = super().filter_moves(move_cand, board)
 
         return valid_moves
 
@@ -347,14 +366,14 @@ class Rook(Piece):
         self.symbol = "R"
         self.n_moves = 3 * (c.BOARD_SIZE - 1)
 
-    def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
+    def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
         _, _, move_cand = super()._init_move_cand(self.n_moves)
 
         # get coordinates of all new moves, valid or not
         move_cand = super()._get_straight_moves()
 
         # check which move candidates are valid and filter them out
-        valid_moves = super().validate_moves(move_cand, board)
+        valid_moves = super().filter_moves(move_cand, board)
 
         return valid_moves
 
@@ -387,14 +406,14 @@ class Knight(Piece):
 
         return move_cand
 
-    def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
+    def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
         x_old, y_old, move_cand = super()._init_move_cand(self.n_moves)
 
         # get coordinates of all new moves, valid or not
         move_cand = self.__move_l_shape(x_old, y_old, move_cand)
 
         # check which move candidates are valid and filter them out
-        valid_moves = super().validate_moves(move_cand, board)
+        valid_moves = super().filter_moves(move_cand, board)
 
         return valid_moves
 
@@ -408,14 +427,14 @@ class Bishop(Piece):
         self.symbol = "B"
         self.n_moves = 2 * (c.BOARD_SIZE - 1)
 
-    def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
+    def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
         _, _, move_cand = super()._init_move_cand(self.n_moves)
 
         # get coordinates of all new moves, valid or not
         move_cand = super()._get_diagonal_moves()
 
         # check which move candidates are valid and filter them out
-        valid_moves = super().validate_moves(move_cand, board)
+        valid_moves = super().filter_moves(move_cand, board)
 
         return valid_moves
 
@@ -430,7 +449,7 @@ class Queen(Piece):
         # queen can go in any direction (not down)
         self.n_moves = 5 * (c.BOARD_SIZE - 1)
 
-    def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
+    def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
         _, _, move_cand = super()._init_move_cand(self.n_moves)
 
         # get coordinates of all new moves, valid or not
@@ -439,7 +458,7 @@ class Queen(Piece):
         move_cand = np.concatenate((diag_mov, straight_mov), axis=0)
 
         # check which move candidates are valid and filter them out
-        valid_moves = super().validate_moves(move_cand, board)
+        valid_moves = super().filter_moves(move_cand, board)
 
         return valid_moves
 
@@ -454,7 +473,7 @@ class King(Piece):
         # the king can go up, left, right, and diagonally 1 square = 5 moves
         self.n_moves = 5
 
-    def get_valid_moves(self, board: np.ndarray) -> np.ndarray:
+    def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
         _, _, move_cand = super()._init_move_cand(self.n_moves)
 
         # get coordinates of all new moves, valid or not
@@ -463,6 +482,8 @@ class King(Piece):
         move_cand = np.concatenate((diag_mov, straight_mov), axis=0)
 
         # check which move candidates are valid and filter them out
-        valid_moves = super().validate_moves(move_cand, board)
+        valid_moves = super().filter_moves(move_cand, board)
 
         return valid_moves
+
+    # TODO: implement column switch filter
