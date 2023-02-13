@@ -243,6 +243,9 @@ class Piece(ABC):
 
             # additional checks for pawn
             if self.name == "Pawn":
+                if piece_enc:
+                    valid_moves[i, :] = -1
+                
                 # check whether it's a diagonal move and opponent's piece is present
                 if abs(move[1] - move[3]) == 1 and board[x][y] is None:
                     valid_moves[i, :] = -1
@@ -251,9 +254,9 @@ class Piece(ABC):
                 elif move[1] == move[3] and board[x][y] is not None:
                     valid_moves[i, :] = -1
                     piece_enc = True
-
+                        
             # check if an illegal jump move has been made
-            if not self.jump:
+            if not self.jump and self.name != 'Pawn' and self.name != 'King':
                 # piece already encountered so invalid move: there's been a jump
                 if piece_enc:
                     valid_moves[i, :] = -1
@@ -297,7 +300,7 @@ class Pawn(Piece):
             self.extra_step
         )
         x_new = np.array(x_new)
-        y_new = [y_old, y_old - 1, y_old + 1] + [y_old] * int(self.extra_step)
+        y_new = [y_old - 1, y_old + 1, y_old] + [y_old] * int(self.extra_step)
         y_new = np.array(y_new)
 
         # if player is black, we need to mirror the row coordinates
