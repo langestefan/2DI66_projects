@@ -156,7 +156,7 @@ class ChessSimulator(Simulator):
                 break
             
             print(f"Player {game_state.get_current_player()} moved {move[0], move[1]} to {move[2], move[3]}")
-            if game_state.chess_board.board[move[0], move[3]].name == 'Pawn' and move[2]%4 == 0: 
+            if game_state.chess_board.board[move[0], move[1]].name == 'Pawn' and move[2]%4 == 0: 
                 print(f"Player {game_state.get_current_player()} promoted pawn to queen at {move[2], move[3]}")
             
 
