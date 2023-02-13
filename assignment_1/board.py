@@ -315,8 +315,15 @@ class ChessBoard:
                 piece.increment_column_switch_count()  # type: ignore
 
         # update the board, move the piece
-        self.board[new_pos[0]][new_pos[1]] = piece
-        piece.set_position(new_pos)  # type: ignore
+        # change pawn to queen in case of promotion 
+        if piece.name == 'Pawn' and new_pos[0]%4 == 0:
+            piece_obj = p.Queen(piece.player)
+            self.put_new_piece_on_board(piece_obj, new_pos, overwrite = True)
+            
+        else:
+            self.board[new_pos[0]][new_pos[1]] = piece
+            piece.set_position(new_pos)  # type: ignore
+        
         if set_old_pos_to_none:
             self.board[old_pos[0]][old_pos[1]] = None
 

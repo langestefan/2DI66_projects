@@ -154,6 +154,11 @@ class ChessSimulator(Simulator):
             # move is none, game is over so we break the loop
             if move is None:
                 break
+            
+            print(f"Player {game_state.get_current_player()} moved {move[0], move[1]} to {move[2], move[3]}")
+            if game_state.chess_board.board[move[0], move[3]].name == 'Pawn' and move[2]%4 == 0: 
+                print(f"Player {game_state.get_current_player()} promoted pawn to queen at {move[2], move[3]}")
+            
 
             # start new round
             game_state.start_new_round(move)
