@@ -134,6 +134,10 @@ class GameState:
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
 
         return valid_moves
+    
+    # TODO: filter pawn moves that are not diagonal attacks so they dont put the king in check
+    # TODO: implement check counter by attacking piece that is attacking the king
+    # TODO: implement check counter by moving piece to block the attack
 
     def __set_check(self, player, check):
         if player == c.Players.WHITE:

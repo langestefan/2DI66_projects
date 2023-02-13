@@ -269,7 +269,7 @@ class Piece(ABC):
         # delete all moves with -1
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
 
-        # print(f'Valid moves for {self.name} at {self.position} are: {valid_moves}')
+        print(f'Valid moves for {self.name} at {self.position} are: {valid_moves}')
 
         return valid_moves
 
