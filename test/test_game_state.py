@@ -83,12 +83,7 @@ class TestClientGameState:
         valid_moves_rook = create_game_state.get_valid_moves(
             player=c.Players.BLACK
         )
-        print(
-            rook_piece.draw_valid_moves(
-                create_empty_board.get_board_arr(), valid_moves_rook
-            )
-        )
         king_in_check = create_game_state.king_is_in_check(
-            player=c.Players.WHITE, valid_moves=valid_moves_rook
+            player=c.Players.WHITE
         )
         assert king_in_check == True

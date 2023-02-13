@@ -137,12 +137,12 @@ class ChessSimulator(Simulator):
         # run the game until it is over, then return the final game state obj
         while game_state.get_game_state() == c.GameStates.ONGOING:
             print("\n-------------------------------------------------\n")
-            print(
-                f"Round: {game_state.get_round_number()}"
-                f"Player: {game_state.get_current_player()}"
-            )
             # increment the round number
             game_state.increment_round_number()
+            print(
+                f"Round: {game_state.get_round_number()}; "
+                f"Player: {game_state.get_current_player()}"
+            )
 
             if game_state.get_current_player() == c.Players.WHITE:
                 print("White's turn")
@@ -157,5 +157,6 @@ class ChessSimulator(Simulator):
 
             # start new round
             game_state.start_new_round(move)
-
+        # print final board state
+        print(f"Final board state: \n{game_state.get_board()}")
         return game_state

@@ -55,7 +55,6 @@ class ChessBoard:
         for i in range(c.BOARD_SIZE):
             s += f"{i} "
             for j in range(c.BOARD_SIZE):
-
                 if self.board[i][j] is None:
                     s += " ."
                 else:
@@ -209,6 +208,21 @@ class ChessBoard:
         pos = pos.squeeze()
         piece = self.board[pos[0]][pos[1]]
         return piece  # type: ignore
+
+    def get_king_obj(self, player: c.Players) -> p.King:
+        """
+        Returns the king object for a given player.
+        :param player: The player whose king is being retrieved.
+        :return: A king.
+        """
+        for i in range(c.BOARD_SIZE):
+            for j in range(c.BOARD_SIZE):
+                if (
+                    self.board[i][j] is not None
+                    and self.board[i][j].get_player() == player
+                    and type(self.board[i][j]) == p.King
+                ):
+                    return self.board[i][j]
 
     def get_piece_loc_by_type(
         self, piece_type: Type[TPieces], player: c.Players
