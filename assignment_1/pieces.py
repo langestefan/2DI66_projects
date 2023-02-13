@@ -276,6 +276,10 @@ class Piece(ABC):
                 # piece already encountered so invalid move: there's been a jump
                 if piece_enc:
                     valid_moves[i, :] = -1
+                    
+                    # check whether it is the last move in one direction
+                    if i % (c.BOARD_SIZE - 1) == (c.BOARD_SIZE - 2):
+                        piece_enc = False
 
                 # check whether a piece has been encountered
                 elif board[x][y] is not None:
