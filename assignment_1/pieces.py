@@ -254,13 +254,10 @@ class Piece(ABC):
             # check if our own piece is present at target position
             if board[x][y] is not None and board[x][y].get_player() == self.player:  # type: ignore
                 valid_moves[i, :] = -1
-                piece_enc = True
                 continue
 
             # additional checks for pawn
             if self.name == "Pawn":
-                if piece_enc:
-                    valid_moves[i, :] = -1
 
                 # check whether it's a diagonal move and opponent's piece is present
                 if abs(move[1] - move[3]) == 1 and board[x][y] is None:
@@ -269,26 +266,25 @@ class Piece(ABC):
                 # check whether it's a vertical move and opponent piece not present
                 elif move[1] == move[3] and board[x][y] is not None:
                     valid_moves[i, :] = -1
-                    piece_enc = True
+                    #piece_enc = True
+                    
+                # check whether it's a vertical move 
+                elif move[1] == move[3] and board[x][y] is None:
+                    # check whether it's a two-step move and an invalid leap was performed 
+                    if i == 3 and board[moves[i-1][2], moves[i-1][3]] is not None:
+                        valid_moves[i, :] = -1
 
             # check if an illegal jump move has been made
             if not self.jump and self.name != "Pawn" and self.name != "King":
-                # piece already encountered so invalid move: there's been a jump
-                if piece_enc:
-                    valid_moves[i, :] = -1
+                # check whether there a step larger than 1 has been done 
+                if i % (c.BOARD_SIZE - 1) > 0:
+                    start = i - i % (c.BOARD_SIZE - 1)
+                    inter_field = moves[start:i][:,2:4]
+                    fields = board[inter_field[:,0], inter_field[:,1]]
                     
-                    # check whether it is the last move in one direction
-                    if i % (c.BOARD_SIZE - 1) == (c.BOARD_SIZE - 2):
-                        piece_enc = False
-
-                # check whether a piece has been encountered
-                elif board[x][y] is not None:
-                    piece_enc = True
-
-                    # check whether it is the last move in one direction
-                    if i % (c.BOARD_SIZE - 1) == (c.BOARD_SIZE - 2):
-                        piece_enc = False
-
+                    if not all(x is None for x in fields):
+                        valid_moves[i, :] = -1
+                    
         # delete all moves with -1
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
 
