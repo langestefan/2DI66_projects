@@ -106,6 +106,14 @@ class GameState:
         """
         return self.chess_board
 
+    def game_had_queen_promoted(self) -> bool:
+        """
+        Returns whether the queen has been promoted.
+
+        :return: True if the queen has been promoted, False otherwise.
+        """
+        return self.chess_board.game_had_queen_promotion()
+
     def get_valid_moves(self, player) -> np.ndarray:
         """Checks which moves are valid for the player.
 

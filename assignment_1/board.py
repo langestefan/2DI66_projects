@@ -55,6 +55,9 @@ class ChessBoard:
         if init_pieces:
             self.__create_initial_board(c.PIECES)
 
+        # keep track of queen promotions
+        self.n_queen_promotions = 0
+
     def __str__(self):
         """Returns a string representation of the board."""
         s = ""
@@ -80,6 +83,14 @@ class ChessBoard:
     def __copy__(self):
         board_cpy = self.board.copy()
         return board_cpy
+
+    def game_had_queen_promotion(self):
+        """
+        Returns True if a queen promotion happened during the game.
+
+        :return: True if a queen was promoted by any player.
+        """
+        return self.n_queen_promotions > 0
 
     def put_new_piece_on_board(
         self,
@@ -323,11 +334,15 @@ class ChessBoard:
             else:
                 piece.increment_column_switch_count()  # type: ignore
 
-        # update the board, move the piece
-        # change pawn to queen in case of promotion
-        if piece.name == "Pawn" and new_pos[0] % 4 == 0:
-            piece_obj = p.Queen(piece.player)
+        # promote pawn to queen if it reaches the end of the board
+        if piece.get_name() == "Pawn" and new_pos[0] % 4 == 0:  # type: ignore
+            piece_obj = p.Queen(piece.get_player())  # type: ignore
             self.put_new_piece_on_board(piece_obj, new_pos, overwrite=True)
+            self.n_queen_promotions += 1
+            logger.debug(
+                f"Player {player} promoted a pawn to a queen.",
+                extra=self.logstr,
+            )
 
         else:
             self.board[new_pos[0]][new_pos[1]] = piece

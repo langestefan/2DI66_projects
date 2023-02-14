@@ -269,7 +269,6 @@ class Piece(ABC):
                 # check whether it's a vertical move and opponent piece not present
                 elif move[1] == move[3] and board[x][y] is not None:
                     valid_moves[i, :] = -1
-                    # piece_enc = True
 
                 # check whether it's a vertical move
                 elif move[1] == move[3] and board[x][y] is None:

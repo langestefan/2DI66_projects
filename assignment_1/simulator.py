@@ -83,31 +83,76 @@ class GameHistory:
             c.GameStates.WHITE_WON: 0,
             c.GameStates.BLACK_WON: 0,
             c.GameStates.DRAW: 0,
+            "white_wins_prop": 0.0,
+            "black_wins_prop": 0.0,
+            "draws_prop": 0.0,
+            "games_played": 0,
             "white_wins_ci_99": 0.0,
             "black_wins_ci_99": 0.0,
             "draws_ci_99": 0.0,
             "white_wins_ci_95": 0.0,
             "black_wins_ci_95": 0.0,
             "draws_ci_95": 0.0,
+            "mean_rounds_per_game": 0.0,
+            "mean_rounds_per_game_ci_99": 0.0,
+            "mean_rounds_per_game_ci_95": 0.0,
+            "n_games_queen_promoted": 0,
+            "n_games_queen_promoted_prop": 0.0,
+            "n_games_queen_promoted_ci_99": 0.0,
+            "n_games_queen_promoted_ci_95": 0.0,
         }
 
-        # count the number of games won by each player or draw
-        for game_run in self.game_runs:
+        # go over all final game states and compute the statistics
+        round_numbers = np.ones(self.games_played) * -1
+        n_games_queen_promoted = 0
+
+        for i, game_run in enumerate(self.game_runs):
             final_state = game_run.get_game_state()
             statistics[final_state] += 1
+            round_numbers[i] = game_run.get_round_number()
+            n_games_queen_promoted += game_run.game_had_queen_promoted()
 
-        # compute the confidence intervals
+        # compute the proportions of the game results
         n = self.games_played
         p_white = statistics[c.GameStates.WHITE_WON] / n
         p_black = statistics[c.GameStates.BLACK_WON] / n
         p_draw = statistics[c.GameStates.DRAW] / n
+        statistics["white_wins_prop"] = np.round(p_white, 3)
+        statistics["black_wins_prop"] = np.round(p_black, 3)
+        statistics["draws_prop"] = np.round(p_draw, 3)
+        statistics["games_played"] = n
 
+        # statistics for queen promotion
+        p_queen_promoted = n_games_queen_promoted / n
+        statistics["n_games_queen_promoted"] = n_games_queen_promoted
+        statistics["n_games_queen_promoted_prop"] = np.round(
+            p_queen_promoted, 3
+        )
+        statistics["n_games_queen_promoted_ci_99"] = self.__ci_binomial(
+            n, p_queen_promoted, 0.99
+        )
+        statistics["n_games_queen_promoted_ci_95"] = self.__ci_binomial(
+            n, p_queen_promoted, 0.95
+        )
+
+        # compute statistics for game result proportions
         statistics["white_wins_ci_99"] = self.__ci_binomial(n, p_white, 0.99)
         statistics["black_wins_ci_99"] = self.__ci_binomial(n, p_black, 0.99)
         statistics["draws_ci_99"] = self.__ci_binomial(n, p_draw, 0.99)
         statistics["white_wins_ci_95"] = self.__ci_binomial(n, p_white, 0.95)
         statistics["black_wins_ci_95"] = self.__ci_binomial(n, p_black, 0.95)
         statistics["draws_ci_95"] = self.__ci_binomial(n, p_draw, 0.95)
+
+        # compute statistics for mean number of rounds per game
+        statistics["mean_rounds_per_game"] = np.round(
+            np.mean(round_numbers), 3
+        )
+        statistics["mean_rounds_per_game_ci_99"] = self.__ci_normal(
+            n, np.mean(round_numbers), np.var(round_numbers), 0.99
+        )
+        statistics["mean_rounds_per_game_ci_95"] = self.__ci_normal(
+            n, np.mean(round_numbers), np.var(round_numbers), 0.95
+        )
 
         return statistics
 
@@ -128,6 +173,27 @@ class GameHistory:
 
         # return the confidence interval
         return (p_low, p_up)
+
+    def __ci_normal(
+        self, n: int, u: np.float32, var: np.float32, alpha: float
+    ) -> tuple:
+        """
+        Computes the confidence interval for a normal distribution.
+
+        :param n: The number of trials.
+        :param u: The mean.
+        :param var: The variance.
+        :param alpha: The significance level.
+        :return: The confidence interval.
+        """
+
+        # assume a normal distr. and get the confidence interval for the mean
+        z = conf_to_z[alpha]
+        u_up = np.round(u + z * np.sqrt(var / n), 3)
+        u_low = np.round(u - z * np.sqrt(var / n), 3)
+
+        # return the confidence interval
+        return (u_low, u_up)
 
 
 class Simulator(ABC):
