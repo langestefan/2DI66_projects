@@ -32,12 +32,18 @@ class GameState:
         chess_board (ChessBoard): The chess board. NxN ndarray.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        white_en_dbl_mv_pawn: bool = False,
+        black_en_dbl_mv_pawn: bool = False,
+    ):
         self.logstr = {"className": self.__class__.__name__}
         self.round_number: int = -1  # Call start_new_round() to increment to 0
         self.current_player: c.Players = c.Players.WHITE  # White starts
         self.game_state: c.GameStates = c.GameStates.ONGOING
-        self.chess_board: ChessBoard = ChessBoard(init_pieces=True)
+        self.chess_board: ChessBoard = ChessBoard(
+            init_pieces=True
+        )
 
     def __str__(self) -> str:
         return f"Round number: {self.round_number}"

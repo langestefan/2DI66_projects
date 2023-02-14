@@ -271,8 +271,12 @@ class ChessSimulator(Simulator):
 
     def __init__(self, parallelize: bool = False, n_jobs: int = 1):
         super().__init__(parallelize=parallelize, n_jobs=n_jobs)
-        self.white_strat = RandomStrategy(player=c.Players.WHITE)
-        self.black_strat = RandomStrategy(player=c.Players.BLACK)
+        self.white_strat = RandomStrategy(
+            player=c.Players.WHITE, allow_two_step_pawn=False
+        )
+        self.black_strat = RandomStrategy(
+            player=c.Players.BLACK, allow_two_step_pawn=False
+        )
 
     def _do_one_run(self, n: int) -> GameState:
         game_state = GameState()

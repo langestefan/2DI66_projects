@@ -298,14 +298,17 @@ class Piece(ABC):
 
 class Pawn(Piece):
     def __init__(
-        self, player: c.Players, init_pos=np.array([-1, -1], dtype=int)
+        self,
+        player: c.Players,
+        extra_step=False,
+        init_pos=np.array([-1, -1], dtype=int),
     ):
         super().__init__(player, init_pos)
         self.name = "Pawn"
         self.symbol = "P"
 
         # note that this is for one pawn and excluding double step at beginning
-        self.extra_step = True
+        self.extra_step = extra_step
         self.n_moves = 3 + int(self.extra_step)
 
     def __move_pawn(
@@ -315,16 +318,18 @@ class Pawn(Piece):
         Returns the coordinates of pawn moves
         """
         # get all possible moves
-        x_new = [x_old - 1] * (self.n_moves - 1) + [x_old - 2] * int(
-            self.extra_step
-        )
+        x_new = [x_old - 1] * 3 + [x_old - 2] * int(self.extra_step)
+
         x_new = np.array(x_new)
         y_new = [y_old - 1, y_old + 1, y_old] + [y_old] * int(self.extra_step)
         y_new = np.array(y_new)
 
         # if player is black, we need to mirror the row coordinates
         if self.player == c.Players.BLACK:
-            x_new = x_new + np.repeat(np.array([2]), len(x_new), axis=0)
+            vert = np.repeat(np.array([2]), len(x_new), axis=0)
+            if self.extra_step:
+                vert[-1] = 4
+            x_new = x_new + vert
 
         move_cand[0 : len(x_new), 2] = x_new
         move_cand[0 : len(x_new), 3] = y_new
@@ -485,5 +490,3 @@ class King(Piece):
         valid_moves = super().filter_moves(move_cand, board)
 
         return valid_moves
-
-    # TODO: implement column switch filter

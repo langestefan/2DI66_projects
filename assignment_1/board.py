@@ -47,7 +47,10 @@ class ChessBoard:
     This class is used to manage a chess board.
     """
 
-    def __init__(self, init_pieces: bool = True):
+    def __init__(
+        self,
+        init_pieces: bool = True,
+    ):
         self.logstr = {"className": self.__class__.__name__}
 
         # Create the board with initial positions.
@@ -187,7 +190,7 @@ class ChessBoard:
         elif piece_type == c.ChessPieceTypes.QUEEN:
             return p.Queen(player)
         elif piece_type == c.ChessPieceTypes.PAWN:
-            return p.Pawn(player)
+            return p.Pawn(player, extra_step=False)
         else:
             raise ValueError("Invalid piece type.")
 

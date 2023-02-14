@@ -5,6 +5,8 @@ import assignment_1.constants as c
 from assignment_1.board import ChessBoard
 from assignment_1.pieces import Pawn, Rook, Knight, Bishop, Queen, King
 
+player = c.Players.WHITE
+
 
 class TestClientPieces:
     @pytest.fixture(autouse=True)
@@ -14,12 +16,12 @@ class TestClientPieces:
         """
         init_pos = np.array([2, 2])  # center, first row of white
         return (
-            Pawn(c.Players.WHITE, init_pos=init_pos),
-            Rook(c.Players.WHITE, init_pos=init_pos),
-            Knight(c.Players.WHITE, init_pos=init_pos),
-            Bishop(c.Players.WHITE, init_pos=init_pos),
-            Queen(c.Players.WHITE, init_pos=init_pos),
-            King(c.Players.WHITE, init_pos=init_pos),
+            Pawn(player, init_pos=init_pos, extra_step=True),
+            Rook(player, init_pos=init_pos),
+            Knight(player, init_pos=init_pos),
+            Bishop(player, init_pos=init_pos),
+            Queen(player, init_pos=init_pos),
+            King(player, init_pos=init_pos),
         )
 
     @pytest.fixture(autouse=True)
@@ -42,7 +44,7 @@ class TestClientPieces:
         """
         for piece in create_pieces:
             assert piece is not None
-            assert piece.player == c.Players.WHITE
+            assert piece.player == player
             assert piece.name is not None
 
     def test_piece_get_player(self, create_pieces):
@@ -50,7 +52,7 @@ class TestClientPieces:
         Tests if the correct player is retrieved.
         """
         for piece in create_pieces:
-            assert piece.get_player() == c.Players.WHITE
+            assert piece.get_player() == player
 
     def test_piece_get_name(self, create_pieces):
         """

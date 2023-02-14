@@ -31,7 +31,7 @@ class Strategy(ABC):
 
 
 class RandomStrategy(Strategy):
-    def __init__(self, player: c.Players, allow_two_step_pawn: bool = True):
+    def __init__(self, player: c.Players, allow_two_step_pawn: bool = False):
         super().__init__(player, allow_two_step_pawn)
         self.logstr = {"className": self.__class__.__name__}
 

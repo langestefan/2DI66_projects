@@ -6,9 +6,9 @@ import logging
 
 
 if __name__ == "__main__":
-    n_jobs = mp.cpu_count() - 1
+    n_jobs = mp.cpu_count() // 2
     parallelize = True
-    n_games = 1000
+    n_games = 100
 
     # Start logging
     logger = logging.getLogger(__name__)
