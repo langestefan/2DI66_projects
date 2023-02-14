@@ -8,7 +8,7 @@ import logging
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 1
     parallelize = True
-    n_games = 100
+    n_games = 10000
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -28,7 +28,8 @@ if __name__ == "__main__":
 
     # Print statistics.
     statistics = game_history.get_statistics()
-    logger.info(
-        f"Statistics: {statistics}",
-        extra={"className": ""},
-    )
+    
+    str = '\n\nStatistics:\n\n'
+    for key, value in statistics.items():
+        str += f"{key}: {value}\n"
+    logger.info(str, extra={"className": ""})
