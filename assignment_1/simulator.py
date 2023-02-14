@@ -1,10 +1,28 @@
 from abc import ABC, abstractmethod
 import multiprocessing as mp
-from time import sleep
+import numpy as np
 
 import assignment_1.constants as c
 from assignment_1.game_state import GameState
 from assignment_1.strategy import RandomStrategy
+
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=(
+        "[%(asctime)s] %(levelname)s [%(name)s::%(className)s:%(lineno)s]"
+        " %(message)s"
+    ),
+)
+
+logger = logging.getLogger(__name__)
+
+conf_to_z = {
+    0.90: 1.645,
+    0.95: 1.960,
+    0.99: 2.576,
+}
 
 
 class GameHistory:
@@ -16,6 +34,7 @@ class GameHistory:
     """
 
     def __init__(self):
+        self.logstr = {"className": self.__class__.__name__}
         self.game_runs: list[GameState] = []
         self.games_played = 0
 
@@ -53,6 +72,63 @@ class GameHistory:
         """
         return self.games_played
 
+    def get_statistics(self) -> dict:
+        """
+        Computes the statistics of the game results.
+
+        :return: Dictionary with statistics.
+        """
+
+        statistics = {
+            c.GameStates.WHITE_WON: 0,
+            c.GameStates.BLACK_WON: 0,
+            c.GameStates.DRAW: 0,
+            "white_wins_ci_99": 0.0,
+            "black_wins_ci_99": 0.0,
+            "draws_ci_99": 0.0,
+            "white_wins_ci_95": 0.0,
+            "black_wins_ci_95": 0.0,
+            "draws_ci_95": 0.0,
+        }
+
+        # count the number of games won by each player or draw
+        for game_run in self.game_runs:
+            final_state = game_run.get_game_state()
+            statistics[final_state] += 1
+
+        # compute the confidence intervals
+        n = self.games_played
+        p_white = statistics[c.GameStates.WHITE_WON] / n
+        p_black = statistics[c.GameStates.BLACK_WON] / n
+        p_draw = statistics[c.GameStates.DRAW] / n
+
+        statistics["white_wins_ci_99"] = self.__ci_binomial(n, p_white, 0.99)
+        statistics["black_wins_ci_99"] = self.__ci_binomial(n, p_black, 0.99)
+        statistics["draws_ci_99"] = self.__ci_binomial(n, p_draw, 0.99)
+        statistics["white_wins_ci_95"] = self.__ci_binomial(n, p_white, 0.95)
+        statistics["black_wins_ci_95"] = self.__ci_binomial(n, p_black, 0.95)
+        statistics["draws_ci_95"] = self.__ci_binomial(n, p_draw, 0.95)
+
+        return statistics
+
+    def __ci_binomial(self, n: int, p: float, alpha: float) -> tuple:
+        """
+        Computes the confidence interval for a binomial distribution.
+
+        :param n: The number of trials.
+        :param p: The probability of success.
+        :param alpha: The significance level.
+        :return: The confidence interval.
+        """
+
+        # assume a binomial distribution and compute the confidence interval
+        z = conf_to_z[alpha]
+        p_up = np.round(p + z * np.sqrt(p * (1 - p) / n), 3)
+        p_low = np.round(p - z * np.sqrt(p * (1 - p) / n), 3)
+
+        # return the confidence interval
+        return (p_low, p_up)
+
 
 class Simulator(ABC):
     """
@@ -61,6 +137,7 @@ class Simulator(ABC):
 
     def __init__(self, parallelize: bool, n_jobs: int):
         super().__init__()
+        self.logstr = {"className": self.__class__.__name__}
         self.game_history: GameHistory = GameHistory()
         self.parallelize = parallelize
         self.n_jobs: int = n_jobs
@@ -136,32 +213,49 @@ class ChessSimulator(Simulator):
 
         # run the game until it is over, then return the final game state obj
         while game_state.get_game_state() == c.GameStates.ONGOING:
-            print("\n-------------------------------------------------\n")
             # increment the round number
             game_state.increment_round_number()
-            print(
-                f"Round: {game_state.get_round_number()}; "
-                f"Player: {game_state.get_current_player()}"
+            logger.debug(
+                (
+                    f"Round: {game_state.get_round_number()}; "
+                    f"Player: {game_state.get_current_player()}"
+                ),
+                extra=self.logstr,
             )
 
             if game_state.get_current_player() == c.Players.WHITE:
-                print("White's turn")
                 move = self.white_strat.get_move(game_state)
             else:
-                print("Black's turn")
                 move = self.black_strat.get_move(game_state)
 
             # move is none, game is over so we break the loop
             if move is None:
                 break
-            
-            print(f"Player {game_state.get_current_player()} moved {move[0], move[1]} to {move[2], move[3]}")
-            if game_state.chess_board.board[move[0], move[1]].name == 'Pawn' and move[2]%4 == 0: 
-                print(f"Player {game_state.get_current_player()} promoted pawn to queen at {move[2], move[3]}")
-            
+
+            logger.debug(
+                (
+                    f"Player {game_state.get_current_player()} moved"
+                    f" {move[0], move[1]} to {move[2], move[3]}"
+                ),
+                extra=self.logstr,
+            )
+            if (
+                game_state.chess_board.board[move[0], move[1]].name == "Pawn"  # type: ignore
+                and move[2] % 4 == 0
+            ):
+                logger.debug(
+                    (
+                        f"Player {game_state.get_current_player()} promoted"
+                        f" pawn to queen at {move[2], move[3]}"
+                    ),
+                    extra=self.logstr,
+                )
 
             # start new round
             game_state.start_new_round(move)
-        # print final board state
-        print(f"Final board state: \n{game_state.get_board()}")
+
+        # log final board state
+        logger.debug(
+            f"Final board state: \n{game_state.get_board()}", extra=self.logstr
+        )
         return game_state

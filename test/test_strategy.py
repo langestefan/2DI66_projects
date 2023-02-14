@@ -1,5 +1,4 @@
 import pytest
-import numpy as np
 
 import assignment_1.constants as c
 from assignment_1.board import ChessBoard

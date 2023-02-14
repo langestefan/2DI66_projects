@@ -1,7 +1,5 @@
-import numpy as np
 import pytest
 
-import assignment_1.constants as c
 from assignment_1.simulator import ChessSimulator
 from assignment_1.board import ChessBoard
 

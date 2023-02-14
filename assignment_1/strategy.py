@@ -1,9 +1,12 @@
-import numpy as np
 import random
 from abc import ABC, abstractmethod
 
 import assignment_1.constants as c
 from assignment_1.game_state import GameState
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Strategy(ABC):
@@ -30,6 +33,7 @@ class Strategy(ABC):
 class RandomStrategy(Strategy):
     def __init__(self, player: c.Players, allow_two_step_pawn: bool = True):
         super().__init__(player, allow_two_step_pawn)
+        self.logstr = {"className": self.__class__.__name__}
 
     def get_move(self, game_state: GameState):
         if type(game_state) is not GameState:
@@ -43,24 +47,26 @@ class RandomStrategy(Strategy):
 
         # no valid moves: king is in checkmate or draw
         if n_moves == 0:
-            print("No valid moves!")
+            logger.debug("No valid moves!", extra=self.logstr)
 
             # no valid moves, checkmate or draw?
             king_in_check = game_state.king_is_in_check(self.player)
-            if king_in_check:
-                print(f"King of player {self.player} is in check!")
 
             # checkmate
             if king_in_check:
+                logger.debug(
+                    f"King of player {self.player} is in checkmate!",
+                    extra=self.logstr,
+                )
                 if self.player == c.Players.WHITE:
-                    print("Black wins!")
+                    logger.info("Black wins!", extra=self.logstr)
                     game_state.set_game_state(c.GameStates.BLACK_WON)
                 else:
-                    print("White wins!")
+                    logger.info("White wins!", extra=self.logstr)
                     game_state.set_game_state(c.GameStates.WHITE_WON)
             # draw
             else:
-                print("Draw!")
+                logger.info("Draw!", extra=self.logstr)
                 game_state.set_game_state(c.GameStates.DRAW)
             return None
 

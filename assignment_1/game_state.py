@@ -3,7 +3,10 @@ import copy
 
 import assignment_1.constants as c
 from assignment_1.board import ChessBoard
-from assignment_1.pieces import King
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class GameState:
@@ -30,6 +33,7 @@ class GameState:
     """
 
     def __init__(self):
+        self.logstr = {"className": self.__class__.__name__}
         self.round_number: int = -1  # Call start_new_round() to increment to 0
         self.current_player: c.Players = c.Players.WHITE  # White starts
         self.game_state: c.GameStates = c.GameStates.ONGOING
@@ -110,23 +114,16 @@ class GameState:
         :return: A list of valid moves for the player.
         """
         # collect all possible moves here
-        all_moves = self.__get_all_moves(player)        
-        print(f"All moves: \n{all_moves}")
+        all_moves = self.__get_all_moves(player)
+        logger.debug(f"All moves: \n{all_moves}", extra=self.logstr)
 
         # remove moves that put king in check
-        valid_moves = self.__sim_if_moves_put_king_in_check(
-            player, all_moves
-        )
+        valid_moves = self.__sim_if_moves_put_king_in_check(player, all_moves)
 
         # filter out invalid moves
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
 
         return valid_moves
-
-    # TODO: filter pawn moves that are not diagonal attacks so they dont put the king in check
-    # TODO: implement check counter by attacking piece that is attacking the king
-    # TODO: implement check counter by moving piece to block the attack
-    # TODO: check if moves put king in check, if so remove them
 
     def king_is_in_check(self, player) -> bool:
         """Checks if the king of the player is in check.
@@ -189,7 +186,6 @@ class GameState:
             # copy the game state (myself)
             gs_cpy = copy.deepcopy(self)
             gs_cpy.current_player = player
-            # print(f"Checking move: {move} for player: {player}.")
 
             # make the move
             gs_cpy.chess_board.move_piece(
@@ -202,7 +198,9 @@ class GameState:
             # check if the king is in check
             if gs_cpy.king_is_in_check(player):
                 # remove the move from the valid moves
-                print(f'Move {move} puts king in check.')
+                logger.debug(
+                    f"Move {move} puts king in check.", extra=self.logstr
+                )
                 moves[idx] = -1
 
             # delete the copy

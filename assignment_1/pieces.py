@@ -3,6 +3,10 @@ import numpy as np
 
 import assignment_1.constants as c
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class Piece(ABC):
     """A base class to represent a piece on a chess board
@@ -11,6 +15,7 @@ class Piece(ABC):
     """
 
     def __init__(self, player: c.Players, init_pos: np.ndarray):
+        self.logstr = {"className": self.__class__.__name__}
         self.player = player  # The player who owns the piece.
         self.name = "Piece"  # Placeholder name for debug, should not be used.
         self.position: np.ndarray = init_pos  # Position on the board.
@@ -235,7 +240,6 @@ class Piece(ABC):
         :return: A list of valid moves for the piece.
         """
         valid_moves = moves.copy()
-        piece_enc = False
 
         for i, move in enumerate(moves):
             x = move[2]  # row nr. of target position
@@ -258,7 +262,6 @@ class Piece(ABC):
 
             # additional checks for pawn
             if self.name == "Pawn":
-
                 # check whether it's a diagonal move and opponent's piece is present
                 if abs(move[1] - move[3]) == 1 and board[x][y] is None:
                     valid_moves[i, :] = -1
@@ -266,32 +269,30 @@ class Piece(ABC):
                 # check whether it's a vertical move and opponent piece not present
                 elif move[1] == move[3] and board[x][y] is not None:
                     valid_moves[i, :] = -1
-                    #piece_enc = True
-                    
-                # check whether it's a vertical move 
+                    # piece_enc = True
+
+                # check whether it's a vertical move
                 elif move[1] == move[3] and board[x][y] is None:
-                    # check whether it's a two-step move and an invalid leap was performed 
-                    if i == 3 and board[moves[i-1][2], moves[i-1][3]] is not None:
+                    # check whether it's a two-step move and an invalid leap was performed
+                    if (
+                        i == 3
+                        and board[moves[i - 1][2], moves[i - 1][3]] is not None
+                    ):
                         valid_moves[i, :] = -1
 
             # check if an illegal jump move has been made
             if not self.jump and self.name != "Pawn" and self.name != "King":
-                # check whether there a step larger than 1 has been done 
+                # check whether there a step larger than 1 has been done
                 if i % (c.BOARD_SIZE - 1) > 0:
                     start = i - i % (c.BOARD_SIZE - 1)
-                    inter_field = moves[start:i][:,2:4]
-                    fields = board[inter_field[:,0], inter_field[:,1]]
-                    
+                    inter_field = moves[start:i][:, 2:4]
+                    fields = board[inter_field[:, 0], inter_field[:, 1]]
+
                     if not all(x is None for x in fields):
                         valid_moves[i, :] = -1
-                    
+
         # delete all moves with -1
         valid_moves = valid_moves[valid_moves[:, 0] != -1]
-
-        # print(
-        #     f"Valid moves for {self.name} at {self.position} are:\n"
-        #     f" {valid_moves}"
-        # )
 
         return valid_moves
 

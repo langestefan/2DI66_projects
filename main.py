@@ -2,12 +2,33 @@ import multiprocessing as mp
 
 from assignment_1.simulator import ChessSimulator
 
+import logging
+
 
 if __name__ == "__main__":
-    simulator = ChessSimulator(parallelize=True, n_jobs=mp.cpu_count() // 2)
+    n_jobs = mp.cpu_count() - 1
+    parallelize = True
+    n_games = 100
+
+    # Start logging
+    logger = logging.getLogger(__name__)
+    logger.info(
+        f"Starting simulator with {n_jobs} jobs, parallelize={parallelize}",
+        extra={"className": ""},
+    )
+
+    # Create a simulator.
+    simulator = ChessSimulator(parallelize=True, n_jobs=n_jobs)
 
     # Run the simulator.
-    simulator.run(n=1)
+    simulator.run(n=n_games)
 
-    # Print the game history.
-    print(simulator.get_game_history())
+    # Get game history.
+    game_history = simulator.get_game_history()
+
+    # Print statistics.
+    statistics = game_history.get_statistics()
+    logger.info(
+        f"Statistics: {statistics}",
+        extra={"className": ""},
+    )

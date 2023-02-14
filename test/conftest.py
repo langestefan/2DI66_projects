@@ -1,5 +1,6 @@
 import pytest
-import sys, os
+import sys
+import os
 
 # to enable parent directory imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

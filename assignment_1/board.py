@@ -4,6 +4,10 @@ from typing import Type, TypeVar
 import assignment_1.constants as c
 import assignment_1.pieces as p
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 # Classic baby chess board representation:
 #   -------------
@@ -44,6 +48,8 @@ class ChessBoard:
     """
 
     def __init__(self, init_pieces: bool = True):
+        self.logstr = {"className": self.__class__.__name__}
+
         # Create the board with initial positions.
         self.board = np.ndarray((c.BOARD_SIZE, c.BOARD_SIZE), dtype=p.Piece)
         if init_pieces:
@@ -293,9 +299,12 @@ class ChessBoard:
         # check if new pos is None, check if the piece is the same color
         if new_pos_cont is not None:
             if new_pos_cont.get_player() == player:  # type: ignore
+                logger.error(
+                    "Invalid move, same color piece here.", extra=self.logstr
+                )
                 raise ValueError("Invalid move, same color piece here.")
-            elif print_info:
-                print(f"Player {player} captured the piece: {new_pos_cont.name}")  # type: ignore
+
+            logger.debug(f"Player {player} captured the piece: {new_pos_cont.name}", extra=self.logstr)  # type: ignore
 
         # check if it's the first move for the pawn
         if type(piece) == p.Pawn:  # type: ignore
@@ -315,18 +324,18 @@ class ChessBoard:
                 piece.increment_column_switch_count()  # type: ignore
 
         # update the board, move the piece
-        # change pawn to queen in case of promotion 
-        if piece.name == 'Pawn' and new_pos[0]%4 == 0:
+        # change pawn to queen in case of promotion
+        if piece.name == "Pawn" and new_pos[0] % 4 == 0:
             piece_obj = p.Queen(piece.player)
-            self.put_new_piece_on_board(piece_obj, new_pos, overwrite = True)
-            
+            self.put_new_piece_on_board(piece_obj, new_pos, overwrite=True)
+
         else:
             self.board[new_pos[0]][new_pos[1]] = piece
             piece.set_position(new_pos)  # type: ignore
-        
+
         if set_old_pos_to_none:
             self.board[old_pos[0]][old_pos[1]] = None
 
         # only for debugging
         if print_info:
-            print(self)
+            logger.debug(self, extra=self.logstr)

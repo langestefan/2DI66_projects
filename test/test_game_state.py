@@ -4,7 +4,7 @@ import numpy as np
 import assignment_1.constants as c
 from assignment_1.game_state import GameState
 from assignment_1.board import ChessBoard
-from assignment_1.pieces import Pawn, Rook, Knight, Bishop, Queen, King
+from assignment_1.pieces import Rook, King
 
 
 class TestClientGameState:
