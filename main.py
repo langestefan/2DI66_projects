@@ -39,10 +39,9 @@ if __name__ == "__main__":
     start_time = time.time()
     simulator.run(n=n_games)
 
-
     # Print time
     st_str = time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))
-    logger.info(f'Simulator finished in {st_str}', extra={"className": ""})
+    logger.info(f"Simulator finished in {st_str}", extra={"className": ""})
 
     # Get game history.
     game_history = simulator.get_game_history()

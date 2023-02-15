@@ -26,9 +26,6 @@ class Strategy(ABC):
         pass
 
 
-# TODO: implement allow_two_step_pawn enable/disable
-
-
 class RandomStrategy(Strategy):
     def __init__(self, player: c.Players, allow_two_step_pawn: bool = False):
         super().__init__(player)
