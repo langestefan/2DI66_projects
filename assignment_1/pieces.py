@@ -225,7 +225,7 @@ class Piece(ABC):
                 else:
                     symbol = f" {board[i][j].symbol}"
                     print(f"board[{i}][{j}] = {board[i][j]}")
-                    symbol = c.bcolors.OKBLUE + symbol + c.bcolors.ENDC
+                    # symbol = c.bcolors.OKBLUE + symbol + c.bcolors.ENDC
                     s += symbol
 
             s += "\n"
@@ -305,7 +305,7 @@ class Pawn(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Pawn"
-        self.symbol = "P"
+        self.symbol = '♙' if player == c.Players.WHITE else '♟'
 
         # note that this is for one pawn and excluding double step at beginning
         self.extra_step = extra_step
@@ -368,7 +368,7 @@ class Rook(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Rook"
-        self.symbol = "R"
+        self.symbol = '♖' if player == c.Players.WHITE else '♜'
         self.n_moves = 3 * (c.BOARD_SIZE - 1)
 
     def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
@@ -389,7 +389,7 @@ class Knight(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Knight"
-        self.symbol = "N"
+        self.symbol = '♘' if player == c.Players.WHITE else '♞'
         self.jump = True
         self.n_moves = 4
 
@@ -429,7 +429,7 @@ class Bishop(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Bishop"
-        self.symbol = "B"
+        self.symbol = '♗' if player == c.Players.WHITE else '♝'
         self.n_moves = 2 * (c.BOARD_SIZE - 1)
 
     def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
@@ -450,7 +450,7 @@ class Queen(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Queen"
-        self.symbol = "Q"
+        self.symbol = '♕' if player == c.Players.WHITE else '♛'
         # queen can go in any direction (not down)
         self.n_moves = 5 * (c.BOARD_SIZE - 1)
 
@@ -474,7 +474,7 @@ class King(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "King"
-        self.symbol = "K"
+        self.symbol = '♔' if self.player == c.Players.WHITE else '♚'
         # the king can go up, left, right, and diagonally 1 square = 5 moves
         self.n_moves = 5
 

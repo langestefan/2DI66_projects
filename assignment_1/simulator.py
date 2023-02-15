@@ -8,7 +8,7 @@ from assignment_1.game_state import GameState
 import logging
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format=(
         "[%(asctime)s] %(levelname)s [%(name)s::%(className)s:%(lineno)s]"
         " %(message)s"
@@ -329,7 +329,7 @@ class ChessSimulator(Simulator):
             game_state.start_new_round(move)
 
         # log final board state
-        logger.debug(
+        logger.info(
             f"Final board state: \n{game_state.get_board()}", extra=self.logstr
         )
         return game_state
