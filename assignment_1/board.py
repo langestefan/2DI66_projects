@@ -66,6 +66,7 @@ class ChessBoard:
 
         # keep track of queen promotions
         self.n_queen_promotions = 0
+        self.n_capture = 0
 
     def __str__(self):
         """Returns a string representation of the board."""
@@ -330,6 +331,7 @@ class ChessBoard:
                 raise ValueError("Invalid move, same color piece here.")
 
             logger.debug(f"Player {player} captured the piece: {new_pos_cont.name}", extra=self.logstr)  # type: ignore
+            self.n_capture += 1 
 
         # check if it's the first move for the pawn
         if type(piece) == p.Pawn:  # type: ignore
