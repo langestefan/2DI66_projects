@@ -8,7 +8,7 @@ from assignment_1.game_state import GameState
 import logging
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format=(
         "[%(asctime)s] %(levelname)s [%(name)s::%(className)s:%(lineno)s]"
         " %(message)s"

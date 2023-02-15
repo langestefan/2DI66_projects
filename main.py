@@ -1,4 +1,5 @@
 import multiprocessing as mp
+import time
 
 from assignment_1.simulator import ChessSimulator
 from assignment_1.strategy import RandomStrategy
@@ -8,9 +9,9 @@ import logging
 
 
 if __name__ == "__main__":
-    n_jobs = mp.cpu_count() // 2
+    n_jobs = mp.cpu_count() - 1
     parallelize = True
-    n_games = 1
+    n_games = 1000
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -35,7 +36,13 @@ if __name__ == "__main__":
     )
 
     # Run the simulator.
+    start_time = time.time()
     simulator.run(n=n_games)
+
+
+    # Print time
+    st_str = time.strftime("%H:%M:%S", time.gmtime(time.time() - start_time))
+    logger.info(f'Simulator finished in {st_str}', extra={"className": ""})
 
     # Get game history.
     game_history = simulator.get_game_history()
