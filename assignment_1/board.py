@@ -49,9 +49,15 @@ class ChessBoard:
 
     def __init__(
         self,
+        white_en_dbl_mv_pawn: bool = False,
+        black_en_dbl_mv_pawn: bool = False,
         init_pieces: bool = True,
     ):
         self.logstr = {"className": self.__class__.__name__}
+
+        # double move pawn
+        self.white_en_dbl_mv_pawn = white_en_dbl_mv_pawn
+        self.black_en_dbl_mv_pawn = black_en_dbl_mv_pawn
 
         # Create the board with initial positions.
         self.board = np.ndarray((c.BOARD_SIZE, c.BOARD_SIZE), dtype=p.Piece)
@@ -190,7 +196,12 @@ class ChessBoard:
         elif piece_type == c.ChessPieceTypes.QUEEN:
             return p.Queen(player)
         elif piece_type == c.ChessPieceTypes.PAWN:
-            return p.Pawn(player, extra_step=False)
+            if player is c.Players.WHITE:
+                return p.Pawn(player, extra_step=self.white_en_dbl_mv_pawn)
+            elif player is c.Players.BLACK:
+                return p.Pawn(player, extra_step=self.black_en_dbl_mv_pawn)
+            else:
+                raise ValueError("Invalid player.")
         else:
             raise ValueError("Invalid piece type.")
 

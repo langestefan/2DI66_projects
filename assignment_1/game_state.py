@@ -30,6 +30,8 @@ class GameState:
         current_player (Players): The player who is currently playing.
         game_state (GameStates): The game state. Ongoing, draw or won.
         chess_board (ChessBoard): The chess board. NxN ndarray.
+        white_strat (Strategy): The strategy of the white player.
+        black_strat (Strategy): The strategy of the black player.
     """
 
     def __init__(
@@ -42,7 +44,9 @@ class GameState:
         self.current_player: c.Players = c.Players.WHITE  # White starts
         self.game_state: c.GameStates = c.GameStates.ONGOING
         self.chess_board: ChessBoard = ChessBoard(
-            init_pieces=True
+            init_pieces=True,
+            white_en_dbl_mv_pawn=white_en_dbl_mv_pawn,
+            black_en_dbl_mv_pawn=black_en_dbl_mv_pawn,
         )
 
     def __str__(self) -> str:

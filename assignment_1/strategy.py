@@ -10,10 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class Strategy(ABC):
-    def __init__(self, player: c.Players, allow_two_step_pawn: bool):
+    def __init__(self, player: c.Players):
         self.player: c.Players = player
         self.move_history: list = []
-        self.allow_two_step_pawn: bool = allow_two_step_pawn
 
     @abstractmethod
     def get_move(self, game_state: GameState):
@@ -32,8 +31,12 @@ class Strategy(ABC):
 
 class RandomStrategy(Strategy):
     def __init__(self, player: c.Players, allow_two_step_pawn: bool = False):
-        super().__init__(player, allow_two_step_pawn)
+        super().__init__(player)
         self.logstr = {"className": self.__class__.__name__}
+        self.allow_two_step_pawn = allow_two_step_pawn
+
+    def get_allow_two_step_pawn(self) -> bool:
+        return self.allow_two_step_pawn
 
     def get_move(self, game_state: GameState):
         if type(game_state) is not GameState:

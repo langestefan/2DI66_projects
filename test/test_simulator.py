@@ -2,6 +2,9 @@ import pytest
 
 from assignment_1.simulator import ChessSimulator
 from assignment_1.board import ChessBoard
+from assignment_1.strategy import RandomStrategy
+
+import assignment_1.constants as c
 
 
 class TestSimulator:
@@ -10,7 +13,10 @@ class TestSimulator:
         """
         Creates a game state object.
         """
-        return ChessSimulator()
+        return ChessSimulator(
+            black_strat=RandomStrategy(player=c.Players.BLACK),
+            white_strat=RandomStrategy(player=c.Players.WHITE),
+        )
 
     @pytest.fixture(autouse=True)
     def create_empty_board(self):

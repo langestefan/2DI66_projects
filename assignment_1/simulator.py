@@ -4,12 +4,11 @@ import numpy as np
 
 import assignment_1.constants as c
 from assignment_1.game_state import GameState
-from assignment_1.strategy import RandomStrategy
 
 import logging
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format=(
         "[%(asctime)s] %(levelname)s [%(name)s::%(className)s:%(lineno)s]"
         " %(message)s"
@@ -269,17 +268,22 @@ class ChessSimulator(Simulator):
     Implements the chess specific simulator.
     """
 
-    def __init__(self, parallelize: bool = False, n_jobs: int = 1):
+    def __init__(
+        self,
+        black_strat,  # type: Strategy
+        white_strat,  # type: Strategy
+        parallelize: bool = False,
+        n_jobs: int = 1,
+    ):
+        self.black_strat = black_strat
+        self.white_strat = white_strat
         super().__init__(parallelize=parallelize, n_jobs=n_jobs)
-        self.white_strat = RandomStrategy(
-            player=c.Players.WHITE, allow_two_step_pawn=False
-        )
-        self.black_strat = RandomStrategy(
-            player=c.Players.BLACK, allow_two_step_pawn=False
-        )
 
     def _do_one_run(self, n: int) -> GameState:
-        game_state = GameState()
+        game_state = GameState(
+            white_en_dbl_mv_pawn=self.white_strat.get_allow_two_step_pawn(),  # type: ignore
+            black_en_dbl_mv_pawn=self.black_strat.get_allow_two_step_pawn(),  # type: ignore
+        )
 
         # run the game until it is over, then return the final game state obj
         while game_state.get_game_state() == c.GameStates.ONGOING:
@@ -294,9 +298,9 @@ class ChessSimulator(Simulator):
             )
 
             if game_state.get_current_player() == c.Players.WHITE:
-                move = self.white_strat.get_move(game_state)
+                move = self.white_strat.get_move(game_state)  # type: ignore
             else:
-                move = self.black_strat.get_move(game_state)
+                move = self.black_strat.get_move(game_state)  # type: ignore
 
             # move is none, game is over so we break the loop
             if move is None:

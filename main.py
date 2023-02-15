@@ -1,6 +1,8 @@
 import multiprocessing as mp
 
 from assignment_1.simulator import ChessSimulator
+from assignment_1.strategy import RandomStrategy
+import assignment_1.constants as c
 
 import logging
 
@@ -8,7 +10,7 @@ import logging
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() // 2
     parallelize = True
-    n_games = 100
+    n_games = 1
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -18,7 +20,19 @@ if __name__ == "__main__":
     )
 
     # Create a simulator.
-    simulator = ChessSimulator(parallelize=True, n_jobs=n_jobs)
+    black_strategy = RandomStrategy(
+        player=c.Players.BLACK, allow_two_step_pawn=False
+    )
+    white_strategy = RandomStrategy(
+        player=c.Players.WHITE, allow_two_step_pawn=True
+    )
+
+    simulator = ChessSimulator(
+        parallelize=True,
+        n_jobs=n_jobs,
+        black_strat=black_strategy,
+        white_strat=white_strategy,
+    )
 
     # Run the simulator.
     simulator.run(n=n_games)
