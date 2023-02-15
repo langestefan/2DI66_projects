@@ -251,12 +251,12 @@ class Piece(ABC):
                 continue
 
             # check if we can switch columns
-            if not self.column_switch and move[1] != move[3]:
+            elif not self.column_switch and move[1] != move[3]:
                 valid_moves[i, :] = -1
                 continue
 
             # check if our own piece is present at target position
-            if board[x][y] is not None and board[x][y].get_player() == self.player:  # type: ignore
+            elif board[x][y] is not None and board[x][y].get_player() == self.player:  # type: ignore
                 valid_moves[i, :] = -1
                 continue
 
@@ -278,9 +278,10 @@ class Piece(ABC):
                         and board[moves[i - 1][2], moves[i - 1][3]] is not None
                     ):
                         valid_moves[i, :] = -1
+                continue
 
             # check if an illegal jump move has been made
-            if not self.jump and self.name != "Pawn" and self.name != "King":
+            elif not self.jump and self.name != "King":
                 # check whether there a step larger than 1 has been done
                 if i % (c.BOARD_SIZE - 1) > 0:
                     start = i - i % (c.BOARD_SIZE - 1)
@@ -305,7 +306,8 @@ class Pawn(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Pawn"
-        self.symbol = '♙' if player == c.Players.WHITE else '♟'
+        #self.symbol = '♙' if player == c.Players.WHITE else '♟'
+        self.symbol = 'P'
 
         # note that this is for one pawn and excluding double step at beginning
         self.extra_step = extra_step
@@ -368,7 +370,8 @@ class Rook(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Rook"
-        self.symbol = '♖' if player == c.Players.WHITE else '♜'
+        #self.symbol = '♖' if player == c.Players.WHITE else '♜'
+        self.symbol = 'R'
         self.n_moves = 3 * (c.BOARD_SIZE - 1)
 
     def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
@@ -389,7 +392,8 @@ class Knight(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Knight"
-        self.symbol = '♘' if player == c.Players.WHITE else '♞'
+        self.symbol = 'N'
+        #self.symbol = '♘' if player == c.Players.WHITE else '♞'
         self.jump = True
         self.n_moves = 4
 
@@ -429,7 +433,8 @@ class Bishop(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Bishop"
-        self.symbol = '♗' if player == c.Players.WHITE else '♝'
+        #self.symbol = '♗' if player == c.Players.WHITE else '♝'
+        self.symbol = 'B'
         self.n_moves = 2 * (c.BOARD_SIZE - 1)
 
     def get_piece_moves(self, board: np.ndarray) -> np.ndarray:
@@ -450,7 +455,8 @@ class Queen(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "Queen"
-        self.symbol = '♕' if player == c.Players.WHITE else '♛'
+        #self.symbol = '♕' if player == c.Players.WHITE else '♛'
+        self.symbol = 'Q'
         # queen can go in any direction (not down)
         self.n_moves = 5 * (c.BOARD_SIZE - 1)
 
@@ -474,7 +480,8 @@ class King(Piece):
     ):
         super().__init__(player, init_pos)
         self.name = "King"
-        self.symbol = '♔' if self.player == c.Players.WHITE else '♚'
+        #self.symbol = '♔' if self.player == c.Players.WHITE else '♚'
+        self.symbol = 'K'
         # the king can go up, left, right, and diagonally 1 square = 5 moves
         self.n_moves = 5
 
