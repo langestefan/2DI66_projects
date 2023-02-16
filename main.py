@@ -1,6 +1,10 @@
 import multiprocessing as mp
 import time
 
+# to show colors on Windows 
+import os
+os.system("")
+
 from assignment_1.simulator import ChessSimulator
 from assignment_1.strategy import RandomStrategy
 import assignment_1.constants as c
@@ -11,7 +15,7 @@ import logging
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 1
     parallelize = True
-    n_games = 1
+    n_games = 10
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -25,7 +29,7 @@ if __name__ == "__main__":
         player=c.Players.BLACK, allow_two_step_pawn=False
     )
     white_strategy = RandomStrategy(
-        player=c.Players.WHITE, allow_two_step_pawn=True
+        player=c.Players.WHITE, allow_two_step_pawn=False
     )
 
     simulator = ChessSimulator(
