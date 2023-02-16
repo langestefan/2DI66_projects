@@ -10,12 +10,13 @@ from assignment_1.strategy import RandomStrategy
 import assignment_1.constants as c
 
 import logging
+import pickle
 
 
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 1
     parallelize = True
-    n_games = 10
+    n_games = 10000
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -57,3 +58,7 @@ if __name__ == "__main__":
     for key, value in statistics.items():
         str += f"{key}: {value}\n"
     logger.info(str, extra={"className": ""})
+    
+    pickle.dump(statistics, open('statistics_nruns=10000.pkl', 'wb'))
+    pickle.dump(logger, open('logger_nruns=10000.pkl', 'wb'))
+    pickle.dump(game_history, open('game_history_nruns=10000.pkl', 'wb'))
