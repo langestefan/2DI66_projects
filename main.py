@@ -16,7 +16,7 @@ import pickle
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 1
     parallelize = True
-    n_games = 10000
+    n_games = 1000
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -59,6 +59,6 @@ if __name__ == "__main__":
         str += f"{key}: {value}\n"
     logger.info(str, extra={"className": ""})
     
-    pickle.dump(statistics, open('statistics_nruns=10000.pkl', 'wb'))
-    pickle.dump(logger, open('logger_nruns=10000.pkl', 'wb'))
-    pickle.dump(game_history, open('game_history_nruns=10000.pkl', 'wb'))
+    pickle.dump(statistics, open(f"statistics_nruns={n_games}.pkl", 'wb'))
+    pickle.dump(logger, open(f"logger_nruns={n_games}.pkl", 'wb'))
+    pickle.dump(game_history, open(f"game_history_nruns={n_games}.pkl", 'wb'))
