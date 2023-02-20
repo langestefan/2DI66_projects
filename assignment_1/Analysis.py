@@ -99,7 +99,7 @@ ax.set_xlabel('Probability')
 ax.set_title('Winning probability per color')
 
 #%% Hypothesis test 
-ttest,pval = stats.ttest_rel(white_winning, black_winning)
+ttest,pval = stats.ttest_rel(black_winning, white_winning)
 print(pval)
 if pval<0.05:
     print("reject null hypothesis")
@@ -125,7 +125,7 @@ prom_draw = []
 r_white = []
 r_black = []
 r_draw = []
-rounds = all_statistics[-1]['rounds_per_match']
+rounds = stats_10000['rounds_per_match']
 
 for i in range(game_history.games_played):
     run = all_runs[i]
