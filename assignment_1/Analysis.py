@@ -7,9 +7,12 @@ Created on Fri Feb 17 09:53:42 2023
 import matplotlib.pyplot as plt 
 import numpy as np 
 import pickle
-import seaborns as sns 
+import seaborn as sns 
 from scipy import stats
+import random 
+import os 
 
+os.chdir(os.path.normpath(os.getcwd() + os.sep + os.pardir)) # go one folder back
 import assignment_1.constants as c
 
 plt.style.use('ggplot') # plotting style 
@@ -20,7 +23,7 @@ all_statistics = [0]*len(all_files)
 
 for i in range(len(all_statistics)):
     nr = all_files[i]
-    file = f"statistics_nruns={nr}.pkl"
+    file = f"assignment_1\data\statistics_nruns={nr}.pkl"
     all_statistics[i] = pickle.load(open(file, 'rb'))
     
     
@@ -81,8 +84,8 @@ black_winning = winner_results - np.ones(np.shape(winner_results))
 means_white = np.zeros((10000,))
 means_black = np.zeros((10000,))
 for i in range(10000):
-    mean_w = np.random.choice(white_winning, size=200).mean()
-    mean_b = np.random.choice(black_winning, size=200).mean()
+    mean_w = np.mean(random.choices(white_winning, k=len(white_winning)))
+    mean_b = np.mean(random.choices(black_winning, k=len(black_winning)))
     means_white[i] = mean_w
     means_black[i] = mean_b
     
@@ -96,7 +99,7 @@ ax.set_xlabel('Probability')
 ax.set_title('Winning probability per color')
 
 #%% Hypothesis test 
-ttest,pval = stats.ttest_rel(means_black, means_white)
+ttest,pval = stats.ttest_rel(white_winning, black_winning)
 print(pval)
 if pval<0.05:
     print("reject null hypothesis")
@@ -105,7 +108,8 @@ else:
     
 #%% Get game_history of 10000 runs
 nr = 10000
-file = f"game_history_nruns={nr}.pkl"
+#os.chdir(os.path.normpath(os.getcwd() + os.sep + os.pardir))
+file = f"assignment_1\data\game_history_nruns={nr}.pkl"
 game_history = pickle.load(open(file, 'rb'))
 
 #%% Gather data about rounds 
