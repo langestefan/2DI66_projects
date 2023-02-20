@@ -72,7 +72,7 @@ plt.legend(['White wins', 'Black wins', 'Draw'])
 #%% Bootstrapping
 #plt.close('all')
 
-file = "statistics_nruns=10000.pkl"
+file = "assignment_1\data\statistics_nruns=10000.pkl"
 stats_10000 = pickle.load(open(file, 'rb'))
 results = stats_10000['results']
 winner_results = results[results != 3] 
