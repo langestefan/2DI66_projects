@@ -1,8 +1,9 @@
 import multiprocessing as mp
 import time
 
-# to show colors on Windows 
+# to show colors on Windows
 import os
+
 os.system("")
 
 from assignment_1.simulator import ChessSimulator
@@ -58,7 +59,7 @@ if __name__ == "__main__":
     for key, value in statistics.items():
         str += f"{key}: {value}\n"
     logger.info(str, extra={"className": ""})
-    
-    pickle.dump(statistics, open(f"statistics_nruns={n_games}.pkl", 'wb'))
-    pickle.dump(logger, open(f"logger_nruns={n_games}.pkl", 'wb'))
-    pickle.dump(game_history, open(f"game_history_nruns={n_games}.pkl", 'wb'))
+
+    pickle.dump(statistics, open(f"statistics_nruns={n_games}.pkl", "wb"))
+    pickle.dump(logger, open(f"logger_nruns={n_games}.pkl", "wb"))
+    pickle.dump(game_history, open(f"game_history_nruns={n_games}.pkl", "wb"))

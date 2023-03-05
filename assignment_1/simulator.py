@@ -92,7 +92,7 @@ class GameHistory:
             "black_wins_std": 0.0,
             "draws_std": 0.0,
             "games_played": 0,
-            # "white_wins_binomial_ci_99": 0.0, 
+            # "white_wins_binomial_ci_99": 0.0,
             # "black_wins_binomial_ci_99": 0.0,
             # "draws_binomial_ci_99": 0.0,
             # "white_wins_binomial_ci_95": 0.0,
@@ -111,22 +111,22 @@ class GameHistory:
             "n_games_queen_promoted_prop": 0.0,
             "n_games_queen_promoted_ci_99": 0.0,
             "n_games_queen_promoted_ci_95": 0.0,
-            'results': [],
-            'rounds_per_match': []
+            "results": [],
+            "rounds_per_match": [],
         }
 
         # go over all final game states and compute the statistics
         round_numbers = np.ones(self.games_played) * -1
         n_games_queen_promoted = 0
-        statistics['results'] = np.ones(self.games_played) * -1
+        statistics["results"] = np.ones(self.games_played) * -1
 
         for i, game_run in enumerate(self.game_runs):
             final_state = game_run.get_game_state()
             statistics[final_state] += 1
             round_numbers[i] = game_run.get_round_number()
-            statistics['results'][i] = final_state.value
+            statistics["results"][i] = final_state.value
             n_games_queen_promoted += game_run.game_had_queen_promoted()
-        statistics['rounds_per_match'] = round_numbers 
+        statistics["rounds_per_match"] = round_numbers
 
         # compute the proportions of the game results
         n = self.games_played
@@ -159,34 +159,40 @@ class GameHistory:
         # statistics["white_wins_binomial_ci_95"] = self.__ci_binomial(n, p_white, 0.95)
         # statistics["black_wins_binomial_ci_95"] = self.__ci_binomial(n, p_black, 0.95)
         # statistics["draws_binomial_ci_95"] = self.__ci_binomial(n, p_draw, 0.95)
-        
-        # game result proportions - mean and standard deviations 
+
+        # game result proportions - mean and standard deviations
         # statistics["white_wins_mean"] = np.mean(results == 1)
         # statistics["black_wins_mean"] = np.mean(results == 2)
         # statistics["draws_mean"] = np.mean(results == 0)
-        statistics["white_wins_std"] = np.round(np.std(statistics['results'] == 1), 4)
-        statistics["black_wins_std"] = np.round(np.std(statistics['results'] == 2), 4)
-        statistics["draws_std"] = np.round(np.std(statistics['results'] == 3), 4)
-        
+        statistics["white_wins_std"] = np.round(
+            np.std(statistics["results"] == 1), 4
+        )
+        statistics["black_wins_std"] = np.round(
+            np.std(statistics["results"] == 2), 4
+        )
+        statistics["draws_std"] = np.round(
+            np.std(statistics["results"] == 3), 4
+        )
+
         # game result proportions - normal distribution CI
-        statistics["white_wins_normal_ci_99"] = self.__ci_normal(n, 
-           p_white, np.var(statistics['results'] == 1), 0.99
-           )
-        statistics["black_wins_normal_ci_99"] = self.__ci_normal(n, 
-           p_black, np.var(statistics['results'] == 2), 0.99
-           )
-        statistics["draws_normal_ci_99"] = self.__ci_normal(n, 
-           p_draw, np.var(statistics['results'] == 3), 0.99
-           )
-        statistics["white_wins_normal_ci_95"] = self.__ci_normal(n, 
-           p_white, np.var(statistics['results'] == 1), 0.95
-           )
-        statistics["black_wins_normal_ci_95"] = self.__ci_normal(n, 
-           p_black, np.var(statistics['results'] == 2), 0.95
-           )
-        statistics["draws_normal_ci_95"] = self.__ci_normal(n, 
-           p_draw, np.var(statistics['results'] == 3), 0.95
-           )
+        statistics["white_wins_normal_ci_99"] = self.__ci_normal(
+            n, p_white, np.var(statistics["results"] == 1), 0.99
+        )
+        statistics["black_wins_normal_ci_99"] = self.__ci_normal(
+            n, p_black, np.var(statistics["results"] == 2), 0.99
+        )
+        statistics["draws_normal_ci_99"] = self.__ci_normal(
+            n, p_draw, np.var(statistics["results"] == 3), 0.99
+        )
+        statistics["white_wins_normal_ci_95"] = self.__ci_normal(
+            n, p_white, np.var(statistics["results"] == 1), 0.95
+        )
+        statistics["black_wins_normal_ci_95"] = self.__ci_normal(
+            n, p_black, np.var(statistics["results"] == 2), 0.95
+        )
+        statistics["draws_normal_ci_95"] = self.__ci_normal(
+            n, p_draw, np.var(statistics["results"] == 3), 0.95
+        )
 
         # compute statistics for mean number of rounds per game
         statistics["mean_rounds_per_game"] = np.round(
