@@ -73,7 +73,6 @@ class QueueSimulator(Simulator):
         super().__init__(n_jobs)
 
     def _do_one_run(self) -> None:
-
         # make a distribution only for testing
         mu = 3.4
         sigma = 1.5
