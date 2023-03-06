@@ -2,6 +2,12 @@ import pytest
 import numpy as np
 import copy
 
+# to enable parent directory imports
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent.parent))
+
 import assignment_1.constants as c
 from assignment_1.board import ChessBoard
 from assignment_1.pieces import Pawn, King

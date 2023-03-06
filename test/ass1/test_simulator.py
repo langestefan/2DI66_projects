@@ -1,5 +1,11 @@
 import pytest
 
+# to enable parent directory imports
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).parent.parent.parent))
+
 from assignment_1.simulator import ChessSimulator
 from assignment_1.board import ChessBoard
 from assignment_1.strategy import RandomStrategy

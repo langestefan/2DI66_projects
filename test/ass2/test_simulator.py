@@ -1,6 +1,11 @@
 import pytest
 from scipy import stats
 
+# to enable parent directory imports
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent))
+
 from assignment_2.simulation import QueueSimulator
 from assignment_2.dist.Distribution import Distribution
 
@@ -12,16 +17,13 @@ class TestSimulator:
         Creates a game state object.
         """
         distributions = [Distribution(stats.poisson(1))]
-        distributions.append(Distribution(stats.expon(scale=1/80)))
-        distributions.append(Distribution(stats.geom(1/3)))
+        distributions.append(Distribution(stats.expon(scale=1 / 80)))
+        distributions.append(Distribution(stats.geom(1 / 3)))
         distributions.append(Distribution(stats.bernoulli(0.4)))
-        distributions.append(Distribution(stats.expon(scale=1/20)))
-        distributions.append(Distribution(stats.expon(scale=1/12)))
-        
-        return QueueSimulator(
-            distributions, 1, 3, False, False, 1 
-        )
-            
+        distributions.append(Distribution(stats.expon(scale=1 / 20)))
+        distributions.append(Distribution(stats.expon(scale=1 / 12)))
+
+        return QueueSimulator(distributions, 1, 3, False, False, 1)
 
     @pytest.fixture(autouse=True)
     def test_simulator_init(self, create_simulator):
