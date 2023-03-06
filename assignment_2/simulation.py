@@ -344,6 +344,8 @@ class QueueSimulator(Simulator) :
                 c1.get_queue().remove_customer(c)   
                 N -= 1
                 
+                # TODO: switch queues if one is shorter (EXTENSION)
+                
                 # TODO: implement Customer.get_queue() function
                 if c1.get_queue().get_length() >= self.nrServers : # someone was waiting
                     c2 = c1.get_queue().next_customer() # longest waiting customer                    
