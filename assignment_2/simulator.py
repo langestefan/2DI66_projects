@@ -3,7 +3,7 @@ import multiprocessing as mp
 import logging
 from scipy import stats
 
-from dist.Distribution import Distribution
+from dist.distribution import Distribution
 
 logger = logging.getLogger(__name__)
 
@@ -74,9 +74,5 @@ class QueueSimulator(Simulator):
 
     def _do_one_run(self) -> None:
         # make a distribution only for testing
-        mu = 3.4
-        sigma = 1.5
-        normDist = stats.norm(mu, sigma)
-        myDist = Distribution(normDist)
 
         return None

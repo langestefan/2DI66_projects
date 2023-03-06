@@ -1,10 +1,11 @@
 import logging
+import scipy.stats as stats
 
 logger = logging.getLogger(__name__)
 
 
 class Customer:
-    def __init__(self, t_arr: float, cash: bool = False):
+    def __init__(self, t_arr: float, cash: bool):
         """
         Creates a new customer.
 
@@ -13,8 +14,10 @@ class Customer:
                      customer uses a bank card.
         """
         self.logstr = {"className": self.__class__.__name__}
-        self.t_arrival = t_arr
         self.use_cash = cash
+        self.t_arrival = t_arr
+
+        # time to grab food
 
     def __str__(self):
         return (
