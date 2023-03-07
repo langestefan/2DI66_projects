@@ -2,6 +2,7 @@ from collections import deque
 import logging
 
 from assignment_2.customer import Customer
+from assignment_2.server import Server
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +14,7 @@ class CQueue:
         self.logstr = {"className": self.__class__.__name__}
         self.queue = deque()
         self.queue_id = queue_id
+        self.servers = []
 
     def __str__(self):
         return "Queue length: " + str(self.get_length())
@@ -81,3 +83,31 @@ class CQueue:
         if queue_length < 0:
             raise ValueError("Queue length cannot be negative.")
         return queue_length
+
+    def add_server(self, server: Server):
+        """
+        Adds a server to the queue.
+
+        :param server: Server to add.
+        """
+        self.servers.append(server)
+
+    def get_n_servers(self):
+        """
+        Returns the number of servers in the queue.
+
+        :return: Number of servers in queue.
+        """
+        return len(self.servers)
+
+    def get_server(self, server_id: int):
+        """
+        Returns the server with the given ID.
+
+        :param server_id: ID of server to return.
+        :return: Server with given ID.
+        """
+        for server in self.servers:
+            if server.get_id() == server_id:
+                return server
+        raise ValueError("Server with given ID does not exist.")

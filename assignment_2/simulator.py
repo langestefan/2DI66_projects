@@ -378,6 +378,19 @@ class QueueSimulator(Simulator):
             for s in range(self.nr_servers):
                 self.servers[s] = Server(id=s)
 
+            # add servers to each queue
+            assert self.nr_servers % self.nr_queues == 0, "Number of servers must be divisible by number of queues."
+            nr_servers_per_queue = self.nr_servers // self.nr_queues
+            if nr_servers_per_queue != c.N_SERVERS:
+                raise ValueError(
+                    "Number of servers per queue must be equal to N_SERVERS."
+                )
+            logger.debug(f'Number of servers per queue: {nr_servers_per_queue}', extra=self.logstr)
+            
+            for queue in self.queues:
+                for s in range(nr_servers_per_queue):
+                    queue.add_server(self.servers[s])
+
             # run simulation
             self.simulate_queue()
 
@@ -413,6 +426,8 @@ class QueueSimulator(Simulator):
 
             # handle customer arrival event
             if e.type == Event.ARRIVAL:
+                logger.debug('--- ARRIVAL ---', extra=self.logstr)
+
                 # get the queue with the shortest length
                 shortest = np.where(q_lengths == np.amin(q_lengths))[0]
                 q_id = random.choice(shortest)
@@ -423,9 +438,15 @@ class QueueSimulator(Simulator):
 
                 # add customer to queue object
                 self.queues[q_id].add_customer(customer=cust, q_id=q_id)  # type: ignore
+                
+                # if there was a free server we schedule a departure event
+                if self.queues[q_id].get_length() <= self.queues[q_id].get_n_servers():  # type: ignore
+                    # TODO: correctly handle this
+                    pass
 
             # handle customer departure event
             elif e.type == Event.DEPARTURE:
+                logger.debug('--- DEPARTURE ---', extra=self.logstr)
                 # get the queue the customer is in and remove the customer from that queue
                 q_id = cust.get_queue_id()
                 self.queues[q_id].remove_customer(customer=cust, q_id=q_id)  # type: ignore
