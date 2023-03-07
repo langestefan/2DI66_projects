@@ -28,7 +28,9 @@ class Group:
 
         if t_grab_food.size != n_customers or use_cash.size != n_customers:
             raise ValueError(
-                f'Nr of customers: {n_customers} does not match the size of t_grab_food: {t_grab_food.size} or use_cash: {use_cash.size}'
+                f"Nr of customers: {n_customers} does not match the size of"
+                f" t_grab_food: {t_grab_food.size} or use_cash:"
+                f" {use_cash.size}"
             )
 
         # list of customers
@@ -40,7 +42,10 @@ class Group:
             t_grab_food = np.array([t_grab_food])
 
         for idx, use_cash_cust in enumerate(use_cash):
-            logger.debug(f'Creating customer {idx} with cash: {use_cash_cust}', extra=self.logstr)
+            logger.debug(
+                f"Creating customer {idx} with cash: {use_cash_cust}",
+                extra=self.logstr,
+            )
 
             # check if t_grab_food is larger than t_arr
             if t_grab_food[idx] <= t_arr:

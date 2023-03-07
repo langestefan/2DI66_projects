@@ -27,7 +27,7 @@ class Event:
             + " of customer "  # noqa: W503
             + str(self.customer)  # noqa: W503
             + " at t = "  # noqa: W503
-            + str(self.time)  # noqa: W503
+            + str(round(self.time, 3))  # noqa: W503
         )
 
     def get_customer(self):

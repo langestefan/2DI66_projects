@@ -344,8 +344,7 @@ class QueueSimulator(Simulator):
 
         # exponential distribution for the arrival time of a group
         self.arrival_time_dist = [
-            Distribution(stats.expon(scale=mu))
-            for mu in c.MU_ARRIVAL_RATE_SEC
+            Distribution(stats.expon(scale=mu)) for mu in c.MU_ARRIVAL_RATE_SEC
         ]
 
         # exponential distribution for the time it takes a customer to grab food
@@ -358,7 +357,7 @@ class QueueSimulator(Simulator):
 
         super().__init__(n_jobs=n_jobs)
 
-    def _do_one_run(self, n: int) -> SimResults:
+    def _do_one_run(self, n: int) -> None:
         """
         Runs a simulation with every rate parameter specified.
 
@@ -367,9 +366,13 @@ class QueueSimulator(Simulator):
         """
         # run simulation once for each rate parameter
         for idx, dist in enumerate(self.arrival_time_dist):
+            logger.debug(
+                f"Running new simulation {n} with rate parameter {idx}",
+                extra=self.logstr,
+            )
             # initialize queues
             for q in range(self.nr_queues):
-                self.queues[q] = CQueue()
+                self.queues[q] = CQueue(queue_id=q)
 
             # initialize servers
             for s in range(self.nr_servers):
@@ -405,14 +408,20 @@ class QueueSimulator(Simulator):
             t = e.time  # update time
             cust = e.get_customer()  # get customer
 
-            logger.debug(f'Event: {e}', extra=self.logstr)
+            logger.debug(f"Event: {e}", extra=self.logstr)
 
             # handle customer arrival event
             if e.type == Event.ARRIVAL:
                 # get the queue with the shortest length
                 shortest = np.where(q_lengths == np.amin(q_lengths))[0]
                 q = random.choice(shortest)
-                logger.debug(f'Shortest queue: {shortest}, selected queue: {q}', extra=self.logstr)
+                logger.debug(
+                    f"Shortest queue: {shortest}, selected queue: {q}",
+                    extra=self.logstr,
+                )
+
+                # add customer to queue object
+                self.queues[q].add_customer(q_id=q, customer=cust)  # type: ignore
 
     def create_new_group(self, t_arr: float, fes: FES) -> FES:
         """

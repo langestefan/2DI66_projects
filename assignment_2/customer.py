@@ -29,9 +29,7 @@ class Customer:
 
     def __str__(self):
         return (
-            "Customer at: "
-            + str(self.t_grab_food)  # noqa: W503
-            + " with cash: "  # noqa: W503
+            "with cash: "  # noqa: W503
             + str(self.use_cash)  # noqa: W503
         )
 
