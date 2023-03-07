@@ -1,8 +1,18 @@
+from assignment_2.customer import Customer
+
+
 class Event:
     ARRIVAL = 0
     DEPARTURE = 1
 
-    def __init__(self, typ, time, cust=None):  # type is a reserved word
+    def __init__(self, typ: int, time: float, cust: Customer):
+        """_summary_
+
+        :param: typ: Event type (arrival or departure)
+        :param: time: Time of event
+        :param: cust: Customer number
+        """
+        self.logstr = {"className": self.__class__.__name__}
         self.type = typ
         self.time = time
         self.customer = cust  # especially needed if there are multiple servers
@@ -12,5 +22,16 @@ class Event:
 
     def __str__(self):
         s = ("Arrival", "Departure")
-        return s[self.type] + " of customer " + str(self.customer)
-        +" at t = " + str(self.time)
+        return (
+            s[self.type]
+            + " of customer "  # noqa: W503
+            + str(self.customer)  # noqa: W503
+            + " at t = "  # noqa: W503
+            + str(self.time)  # noqa: W503
+        )
+
+    def get_customer(self):
+        """
+        Returns the customer associated with this event.
+        """
+        return self.customer

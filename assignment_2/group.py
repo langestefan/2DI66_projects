@@ -20,26 +20,37 @@ class Group:
         :param n_customers: The number of customers in the group.
         :param use_cash: A list of booleans indicating whether the customer uses cash or not.
         :param t_arr: The time the group arrived.
-        :param t_grab_food: A list of times the customers need to grab their food.
+        :param t_grab_food: A list of times the customers need to grab their food. (counting up from t_arr)
         """
         self.logstr = {"className": self.__class__.__name__}
         self.t_arrival = t_arr
         self.n_customers = n_customers
 
-        if len(t_grab_food) != n_customers or len(use_cash) != n_customers:
+        if t_grab_food.size != n_customers or use_cash.size != n_customers:
             raise ValueError(
-                "Nr of customers and nr grab food times do not match."
+                f'Nr of customers: {n_customers} does not match the size of t_grab_food: {t_grab_food.size} or use_cash: {use_cash.size}'
             )
 
         # list of customers
         self.customers = np.empty(n_customers, dtype=Customer.Customer)
 
-        # add customers to the group
+        # if it is a single customer we need to make it an array
+        if not isinstance(use_cash, np.ndarray):
+            use_cash = np.array([use_cash])
+            t_grab_food = np.array([t_grab_food])
+
         for idx, use_cash_cust in enumerate(use_cash):
+            logger.debug(f'Creating customer {idx} with cash: {use_cash_cust}', extra=self.logstr)
+
+            # check if t_grab_food is larger than t_arr
+            if t_grab_food[idx] <= t_arr:
+                raise ValueError("t_grab_food <= t_arr")
+
+            # create customer
             self.customers[idx] = Customer.Customer(
                 t_arr=t_arr,
                 t_grab_food=t_grab_food[idx],
-                cash=use_cash_cust,
+                cash=bool(use_cash_cust),
             )
 
     def __str__(self):
@@ -49,10 +60,8 @@ class Group:
             + " with N: "  # noqa: W503
         )
 
-    def add_customer(self, customer):
-        """
-        Adds a customer to the group.
+    def get_customers(self):
+        return self.customers
 
-        :param customer: The customer to add.
-        """
-        self.customers.append(customer)
+    def get_nr_customers(self):
+        return self.n_customers

@@ -39,7 +39,7 @@ class SimResults:
         self.sojournC = deque()
         self.sojournG = deque()
 
-    def registerQueueLength(self, time, ql):
+    def register_queue_length(self, time, ql):
         # queue length registered at each change, even if change only
         # occurred in one queue only
 
@@ -58,7 +58,7 @@ class SimResults:
                 f" {self.MAX_ENTRIES}"
             )
 
-    def registerWaitingTime(self, w, q):
+    def register_waiting_time(self, w, q):
         self.hist_w[self.nrEntries_w, q] = w
         self.sumW[q] += w
         self.sumW2[q] += w * w
@@ -71,15 +71,15 @@ class SimResults:
                 f" {self.MAX_ENTRIES}"
             )
 
-    def registerCanteen(self, n):
+    def register_canteen(self, n):
         self.canteen.append(n)
 
-    def registerGroup(self, g):
+    def register_group(self, g):
         self.group.append(g)
         # get_customers returns deque
         self.customers += g.get_customers()
 
-    def registerSojournTime(self, c):
+    def register_sojourn_t(self, c):
         # TODO: Check variable names of customer
         # NOTE: c.arrivalTime is without grabTime!
         self.sojournC.append(c.depTime - c.arrivalTime)
@@ -89,34 +89,34 @@ class SimResults:
             # TODO: Add departure & arrival time of group to class Group
             self.sojournG.append(c.get_group.depTime - c.get_group.arrivalTime)
 
-    def getMeanQueueLength(self):
+    def get_mean_ql(self):
         return self.sumQL / self.oldTime
 
-    def getVarianceQueueLength(self):
+    def get_var_ql(self):
         return self.sumQL2 / self.oldTime - self.getMeanQueueLength() ** 2
 
-    def getMeanWaitingTime(self):
+    def get_mean_wait_t(self):
         return self.sumW / self.nW
 
-    def getVarianceWaitingTime(self):
+    def get_var_wait_t(self):
         return self.sumW2 / self.nW - self.getMeanWaitingTime() ** 2
 
-    def getMeanCustomersCanteen(self):
+    def get_mean_cust_canteen(self):
         return np.mean(self.canteen)
 
-    def getMeanSojournCustomer(self):
+    def get_mean_sojourn_cust(self):
         return np.mean(self.sojournC)
 
-    def getMeanSojournGroup(self):
+    def get_mean_sojourn_group(self):
         return np.mean(self.sojournG)
 
-    def getQueueLengthHistogramData(self):
+    def get_ql_hist(self):
         return self.hist_ql
 
-    def getWaitingTimesHistogramData(self):
+    def get_wait_t_hist(self):
         return self.hist_w
 
-    def getTimes(self):
+    def get_times(self):
         return self.times
 
     def __str__(self):
@@ -140,10 +140,10 @@ class SimResults:
 
         return s
 
-    def histQueueLength(self, maxq=50):
+    def hist_ql(self, maxq=50):
         # TODO: Implement histogram plotting
         pass
 
-    def histWaitingTimes(self, nrBins=100):
+    def hist_wait_t(self, nrBins=100):
         # TODO: Implement histogram plotting
         pass

@@ -17,3 +17,6 @@ MU_CUSTOM_GRAB_FOOD = 80
 # with mean arrival rate of 1, 2, 3, 4 groups per minute
 MU_ARRIVAL_RATE_MIN = [1, 2, 3, 4]
 MU_ARRIVAL_RATE_SEC = [x / 60 for x in MU_ARRIVAL_RATE_MIN]
+
+# simulation duration 12:00 - 13:00 in seconds
+SIM_T = 3600

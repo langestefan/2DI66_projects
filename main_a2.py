@@ -18,7 +18,7 @@ os.system("")
 
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 1
-    n_games = 1000
+    n_sims = 1
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -29,3 +29,9 @@ if __name__ == "__main__":
 
     # Create a simulator.
     simulator = sim.QueueSimulator(n_jobs=n_jobs)
+
+    # Run the simulator.
+    simulator.run(n=n_sims)
+
+    # # Get the results.
+    # results = simulator.get_results()

@@ -4,6 +4,7 @@ import numpy as np
 import multiprocessing as mp
 import logging
 
+import random
 import scipy.stats as stats
 from dist.distribution import Distribution
 
@@ -322,6 +323,7 @@ class QueueSimulator(Simulator):
         nr_queues: int = 3,
         n_jobs: int = 1,
     ):
+        self.logstr = {"className": self.__class__.__name__}
         self.nr_queues = nr_queues
         self.nr_servers = nr_servers
 
@@ -331,8 +333,8 @@ class QueueSimulator(Simulator):
                 "Number of servers must be equal to number of queues."
             )
 
-        self.queues = np.empty(nr_queues)
-        self.servers = np.empty(nr_servers)
+        self.queues = np.empty(nr_queues, dtype=CQueue)
+        self.servers = np.empty(nr_servers, dtype=Server)
 
         # simulation history
         self.sim_history: SimHistory = SimHistory()
@@ -342,13 +344,13 @@ class QueueSimulator(Simulator):
 
         # exponential distribution for the arrival time of a group
         self.arrival_time_dist = [
-            Distribution(stats.expon(scale=1 / mu))
+            Distribution(stats.expon(scale=mu))
             for mu in c.MU_ARRIVAL_RATE_SEC
         ]
 
         # exponential distribution for the time it takes a customer to grab food
         self.grab_food_dist = Distribution(
-            stats.expon(scale=1 / c.MU_CUSTOM_GRAB_FOOD)
+            stats.expon(scale=c.MU_CUSTOM_GRAB_FOOD)
         )
 
         # bernoulli distribution for cash or card payment with p = p_cash
@@ -358,8 +360,9 @@ class QueueSimulator(Simulator):
 
     def _do_one_run(self, n: int) -> SimResults:
         """
-        Runs one full simulation.
+        Runs a simulation with every rate parameter specified.
 
+        :param n: The number of the simulation run.
         :return: The simulation results.
         """
         # run simulation once for each rate parameter
@@ -372,117 +375,76 @@ class QueueSimulator(Simulator):
             for s in range(self.nr_servers):
                 self.servers[s] = Server(id=s)
 
-            # initialize future event set
-            fes = FES()
+            # run simulation
+            self.simulate_queue()
 
-    def simulate_queue(self, n: int) -> SimResults:
+    def simulate_queue(self) -> None:
         """
         Runs one full simulation.
 
         :return: The simulation results.
         """
-        pass
+        # initialize simulation
+        fes = FES()
+        self.res = SimResults(self.queues.size)
+        t = 0
 
-    # def _do_one_run(self, T: int) -> SimResults:
-    #     fes = FES()  # future event set
-    #     self.res = SimResults(len(self.queues))  # simulation results
-    #     t = 0  # current time
+        # create first group and update the FES with new arrival events
+        fes = self.create_new_group(t_arr=t, fes=fes)
 
-    #     # TODO: Implement class Queue and it accepting distributions
-    #     # TODO: class Queue also creates Server objects
-    #     # initialize queues
-    #     for q in range(self.nr_queues):
-    #         self.queues[q] = Queue(self.servDist, self.nr_servers)
+        # run simulation until t > SIM_T
+        while t < c.SIM_T:
+            # TODO: register canteen occupancy (number of customers in canteen)
+            # TODO: register queue lengths
 
-    #     # initial customers
-    #     g, c = self.create_new_group(t, T)  # first group
-    #     N = len(c)
+            # get queue lengths
+            q_lengths = self.get_queue_lengths()
 
-    #     while t < T or N > 0:  # main loop
-    #         self.res.registerCanteen(N)
-    #         lengths = self.get_queue_lengths()  # current queue lengths
-    #         self.res.registerQueueLength(t, lengths)  # register queue lengths
+            # get next event from FES
+            e = fes.next()  # jump to next event
+            t = e.time  # update time
+            cust = e.get_customer()  # get customer
 
-    #         # get next event
-    #         e = fes.next()  # jump to next event
-    #         t = e.time  # update the time
-    #         c1 = e.customer  # customer associated with this event
+            logger.debug(f'Event: {e}', extra=self.logstr)
 
-    #         if e.type == Event.ARRIVAL:  # handle an arrival event
-    #             shortest = np.where(lengths == np.amin(t))[
-    #                 0
-    #             ]  # get index of shortest queue
-    #             q = random.choice(
-    #                 shortest
-    #             )  # get (random if same length) shortest queue
+            # handle customer arrival event
+            if e.type == Event.ARRIVAL:
+                # get the queue with the shortest length
+                shortest = np.where(q_lengths == np.amin(q_lengths))[0]
+                q = random.choice(shortest)
+                logger.debug(f'Shortest queue: {shortest}, selected queue: {q}', extra=self.logstr)
 
-    #             # TODO: Implement class Customer adding queue number
-    #             c1.add_queue(q)  # add queue number to customer object
-
-    #             # TODO: Implement class Queue adding customers
-    #             self.queues[q].add_customer(c1)  # add customer to queue
-
-    #             # TODO: Implement class Queue.get_length()
-    #             # TODO: Implement Queue.sample_servDist()
-    #             if (
-    #                 self.queues[q].get_length() <= self.queues[q].nr_servers
-    #             ):  # there was a free server
-    #                 self.res.registerWaitingTime(t - c1.arrivalTime)
-    #                 servT = self.queues[q].sample_servDist()
-    #                 dep = Event(Event.DEPARTURE, t + servT, c1)
-    #                 fes.add(dep)  # schedule his departure
-
-    #                 # TODO: implement Customer.register_depTime
-    #                 c1.register_depTime(t + servT)
-    #                 self.res.registerSojournTime(c1)
-
-    #             g, c2 = self.create_new_group(t, T)  # create next arrival
-    #             N += len(c2)
-
-    #         elif e.type == Event.DEPARTURE:  # handle a departure event
-    #             # TODO: implement Queue.remove_customer()
-    #             c1.get_queue().remove_customer(c)
-    #             N -= 1
-
-    #             # TODO: switch queues if one is shorter (EXTENSION)
-
-    #             # TODO: implement Customer.get_queue() function
-    #             if (
-    #                 c1.get_queue().get_length() >= self.nr_servers
-    #             ):  # someone was waiting
-    #                 c2 = (
-    #                     c1.get_queue().next_customer()
-    #                 )  # longest waiting customer
-    #                 self.res.registerWaitingTime(t - c2.arrivalTime)
-    #                 servT = c1.get_queue().sample_servDist()
-    #                 dep = Event(Event.DEPARTURE, t + servT, c2)
-    #                 fes.add(dep)  # schedule this departure
-
-    #                 c2.register_depTime(t + servT)
-    #                 self.res.registerSojournTime(c2)
-
-    #     return self.res
-
-    def create_new_group(self) -> Group:
+    def create_new_group(self, t_arr: float, fes: FES) -> FES:
         """
         Create a new group of customers.
+
+        :param t_arr: The arrival time of the group.
+        :param fes: The current future event schedule before the group arrived.
+        :return: The updated future event schedule after the group arrived.
         """
         # sample distributions for group size, arrival time and grab time and cash usage
-        t_arr = self.grab_food_dist.rvs(1)
         n_customers = self.group_size_dist.rvs(1)
-        t_grab = self.grab_food_dist.rvs(n_customers)
+        t_grab = t_arr + self.grab_food_dist.rvs(n_customers)
         use_cash = self.use_cash_dist.rvs(n_customers)
 
-        # create group of customers and return it
-        return Group(n_customers, use_cash, t_arr, t_grab)
+        # create group of customers
+        group = Group(n_customers, use_cash, t_arr, t_grab)
+
+        # create an arrival event for each customer in the group, and add it to the FES
+        for customer in group.get_customers():
+            fes.add(Event(Event.ARRIVAL, customer.get_t_done_grab(), customer))
+
+        return fes
 
     def get_queue_lengths(self) -> np.ndarray:
         """
         Get the length of each queue.
 
+        Also set the shortest queue.
+
         :return: The current queue lengths stored in a numpy array.
         """
-        lengths = np.array([len(x.length) for x in self.queues])
-        logger.debug(f"Current queue lengths: {lengths}")
+        lengths = np.array([q.get_length() for q in self.queues])
+        logger.debug(f"Current queue lengths: {lengths}", extra=self.logstr)
 
         return lengths
