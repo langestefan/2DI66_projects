@@ -3,9 +3,11 @@ import pytest
 # to enable parent directory imports
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 from assignment_2.group import Group
+from assignment_2.dist.Distribution import Distribution
 
 
 t_arrival = 0
@@ -19,7 +21,7 @@ class TestGroup:
         Creates a chess board object
         """
 
-        return Group(t_arr=t_arrival, N=group_size)
+        return Group(n_customers, use_cash, t_arr, t_grab)
 
     def test_group_creation(self, create_group):
         """
