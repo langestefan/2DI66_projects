@@ -39,12 +39,26 @@ class CQueue:
             extra=self.logstr,
         )
 
-    def remove_customer(self, customer: Customer, q_id: int):
+    def get_customer_at_pos(self, pos: int):
+        """
+        Returns the customer at the front of the queue.
+
+        :param pos: Position of customer in queue.
+
+        :return: Customer at position pos in queue.
+        """
+        if self.get_length() < pos:
+            raise ValueError("Queue is not long enough to get customer at pos.")
+        
+        return self.queue[pos]
+
+    def remove_customer(self, q_id: int, customer=None):
         """
         Removes a customer from the queue.
 
-        :param customer: Customer to add.
         :param q_id: Queue ID to add customer to. Only used for sanity check.
+        :param customer: Customer to remove. Only used for sanity check. If None,
+          we assume that the customer at the front of the queue is the one we want
         :return: Customer that was removed from queue.
         """
         if q_id != self.queue_id:
@@ -62,16 +76,25 @@ class CQueue:
             extra=self.logstr,
         )
 
+        # remove customer from queue
+        cust_front_q = self.queue.popleft()
+        logger.debug(
+            f"Removed customer from queue: {cust_front_q}", extra=self.logstr
+        )
+
         # at this point popleft will give us the customer at the front of the queue
         # this customer must match the one we received from a DEPARTURE event
-        cust_front_q = self.queue.popleft()
-        if (
-            cust_front_q.get_t_done_grab() != customer.get_t_done_grab()
-        ):  # compare arrival timestamps
-            raise ValueError(
-                "Customer we want to remove is not the customer at the front"
-                " of the queue."
-            )
+        if customer is not None:
+            logger.debug(f"Comparing customer: {customer}", extra=self.logstr)
+            if (
+                cust_front_q.get_t_done_grab() != customer.get_t_done_grab()
+            ):  # compare arrival timestamps
+                raise ValueError(
+                    "Customer we want to remove is not the customer at the"
+                    " front of the queue."
+                )
+
+        return cust_front_q
 
     def get_length(self):
         """

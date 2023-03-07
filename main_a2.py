@@ -4,6 +4,7 @@ import os
 
 # custom imports
 import assignment_2.simulator as sim
+import assignment_2.constants as c
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -17,7 +18,7 @@ os.system("")
 
 
 if __name__ == "__main__":
-    n_jobs = mp.cpu_count() - 1
+    n_jobs = 1  # mp.cpu_count() - 1
     n_sims = 1
 
     # Start logging
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     )
 
     # Create a simulator.
-    simulator = sim.QueueSimulator(n_jobs=n_jobs)
+    simulator = sim.QueueSimulator(n_jobs=n_jobs, nr_queues=c.N_QUEUES, nr_servers=c.N_SERVERS)
 
     # Run the simulator.
     simulator.run(n=n_sims)

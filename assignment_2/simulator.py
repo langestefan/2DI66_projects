@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import multiprocessing as mp
 import logging
+import time
 
 import random
 import scipy.stats as stats
@@ -327,6 +328,8 @@ class QueueSimulator(Simulator):
         self.nr_queues = nr_queues
         self.nr_servers = nr_servers
 
+        logger.debug(f'Nr. of queues: {nr_queues}, nr. of servers: {nr_servers}', extra=self.logstr)
+
         # we currently only support one server per queue
         if nr_servers != nr_queues:
             raise ValueError(
@@ -367,7 +370,10 @@ class QueueSimulator(Simulator):
         # run simulation once for each rate parameter
         for idx, dist in enumerate(self.arrival_time_dist):
             logger.debug(
-                f"Running new simulation {n} with rate parameter: {c.MU_ARRIVAL_RATE_MIN[idx]} / min",
+                (
+                    f"Running new simulation {n} with rate parameter:"
+                    f" {c.MU_ARRIVAL_RATE_MIN[idx]} / min"
+                ),
                 extra=self.logstr,
             )
             # initialize queues
@@ -376,17 +382,18 @@ class QueueSimulator(Simulator):
 
             # initialize servers
             for s in range(self.nr_servers):
-                self.servers[s] = Server(id=s)
+                self.servers[s] = Server(
+                    id=s, mu_cash=c.MU_SERVICE_CASH, mu_card=c.MU_SERVICE_BANK
+                )
 
             # add servers to each queue
-            assert self.nr_servers % self.nr_queues == 0, "Number of servers must be divisible by number of queues."
+            assert (self.nr_servers % self.nr_queues == 0), "Number of servers must be divisible by number of queues."
             nr_servers_per_queue = self.nr_servers // self.nr_queues
-            if nr_servers_per_queue != c.N_SERVERS:
-                raise ValueError(
-                    "Number of servers per queue must be equal to N_SERVERS."
-                )
-            logger.debug(f'Number of servers per queue: {nr_servers_per_queue}', extra=self.logstr)
-            
+            logger.debug(
+                f"Number of servers per queue: {nr_servers_per_queue}",
+                extra=self.logstr,
+            )
+
             for queue in self.queues:
                 for s in range(nr_servers_per_queue):
                     queue.add_server(self.servers[s])
@@ -400,6 +407,10 @@ class QueueSimulator(Simulator):
 
         :return: The simulation results.
         """
+        # debug variables to keep track of stuff
+        n_arrivals = 0
+        n_departures = 0
+
         # initialize simulation
         fes = FES()
         self.res = SimResults(self.queues.size)
@@ -410,6 +421,7 @@ class QueueSimulator(Simulator):
 
         # run simulation until t > SIM_T
         while t < c.SIM_T:
+            time.sleep(0.5)
             # TODO: register canteen occupancy (number of customers in canteen)
             # TODO: register queue lengths
             # TODO: register waiting times
@@ -426,7 +438,8 @@ class QueueSimulator(Simulator):
 
             # handle customer arrival event
             if e.type == Event.ARRIVAL:
-                logger.debug('--- ARRIVAL ---', extra=self.logstr)
+                n_arrivals += 1
+                logger.debug(f'--- ARRIVAL total: {n_arrivals} ---', extra=self.logstr)
 
                 # get the queue with the shortest length
                 shortest = np.where(q_lengths == np.amin(q_lengths))[0]
@@ -438,18 +451,51 @@ class QueueSimulator(Simulator):
 
                 # add customer to queue object
                 self.queues[q_id].add_customer(customer=cust, q_id=q_id)  # type: ignore
-                
+
+                # store q_id in customer object
+                cust.set_queue_id(q_id)
+
                 # if there was a free server we schedule a departure event
                 if self.queues[q_id].get_length() <= self.queues[q_id].get_n_servers():  # type: ignore
-                    # TODO: correctly handle this
-                    pass
+                    # get the server that will serve the customer
+                    # TODO: for now we only support one server per queue so id is always 0
+                    server = self.queues[q_id].get_server(server_id=0)  # type: ignore
+                    t_service = t + server.get_service_time(
+                        cust.get_uses_cash()
+                    )
+
+                    # schedule departure event
+                    dep_event = Event(Event.DEPARTURE, t_service, cust)
+                    fes.add(dep_event)
+
+                # create new group and update the FES with new arrival events
+                fes = self.create_new_group(t_arr=t, fes=fes)
 
             # handle customer departure event
             elif e.type == Event.DEPARTURE:
-                logger.debug('--- DEPARTURE ---', extra=self.logstr)
+                n_departures += 1
+                logger.debug(f'--- DEPARTURE total: {n_departures} ---', extra=self.logstr)
                 # get the queue the customer is in and remove the customer from that queue
+                # TODO: do we check each queue if the customer is there or do we just store the queue id in the customer obj?
                 q_id = cust.get_queue_id()
                 self.queues[q_id].remove_customer(customer=cust, q_id=q_id)  # type: ignore
+
+                # if there are customers waiting we schedule a departure event for the next customer
+                nr_servers = self.queues[q_id].get_n_servers()  # type: ignore
+                if self.queues[q_id].get_length() >= nr_servers:  # type: ignore
+
+                    # get the next customer in the queue
+                    cust = self.queues[q_id].get_customer_at_pos(pos=nr_servers - 1)  # type: ignore
+
+                    # get the server that will serve the customer
+                    server = self.queues[q_id].get_server(server_id=0)  # type: ignore
+                    t_service = t + server.get_service_time(
+                        cust.get_uses_cash()
+                    )
+
+                    # schedule departure event
+                    dep_event = Event(Event.DEPARTURE, t_service, cust)
+                    fes.add(dep_event)
 
     def create_new_group(self, t_arr: float, fes: FES) -> FES:
         """
@@ -468,7 +514,7 @@ class QueueSimulator(Simulator):
         group = Group(n_customers, use_cash, t_arr, t_grab)
 
         # create an arrival event for each customer in the group, and add it to the FES
-        for customer in group.get_customers():
+        for idx, customer in enumerate(group.get_customers()):
             fes.add(Event(Event.ARRIVAL, customer.get_t_done_grab(), customer))
 
         return fes

@@ -42,10 +42,6 @@ class Group:
             t_grab_food = np.array([t_grab_food])
 
         for idx, use_cash_cust in enumerate(use_cash):
-            logger.debug(
-                f"Creating customer {idx} with cash: {use_cash_cust}",
-                extra=self.logstr,
-            )
 
             # check if t_grab_food is larger than t_arr
             if t_grab_food[idx] <= t_arr:

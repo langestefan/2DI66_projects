@@ -22,13 +22,17 @@ class Customer:
         self.use_cash = cash
         self.t_arrival_group = t_arr
         self.t_grab_food = t_grab_food
+        self.queue_id = -1
 
         # make sure t_grab_food > t_arrival_group
         if t_grab_food <= t_arr:
             raise ValueError("t_grab_food <= t_arr")
 
     def __str__(self):
-        return "with cash: " + str(self.use_cash)  # noqa: W503  # noqa: W503
+        return (
+            f"Customer: t_arr: {round(self.t_arrival_group, 3)}, t_grab_food:"
+            f" {round(self.t_grab_food, 3)}, cash: {bool(self.use_cash)}"
+        )
 
     def get_t_done_grab(self):
         """
@@ -37,3 +41,31 @@ class Customer:
         :return: Time stamp of done grabbing food.
         """
         return self.t_grab_food
+
+    def get_uses_cash(self):
+        """
+        Returns whether the customer uses cash to pay.
+
+        :return: True if the customer uses cash, False otherwise.
+        """
+        return self.use_cash
+
+    def set_queue_id(self, queue_id: int):
+        """
+        Sets the queue id of the customer.
+
+        :param queue_id: Assigned queue id.
+        """
+        if queue_id < 0:
+            raise ValueError("queue_id must be >= 0")
+        self.queue_id = queue_id
+
+    def get_queue_id(self):
+        """
+        Returns the queue id of the customer.
+
+        :return: Queue id customer is assigned to.
+        """
+        if self.queue_id < 0:
+            raise ValueError("queue_id was never set!")
+        return self.queue_id
