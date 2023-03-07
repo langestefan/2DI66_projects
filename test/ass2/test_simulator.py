@@ -4,10 +4,10 @@ from scipy import stats
 # to enable parent directory imports
 import sys
 from pathlib import Path
+
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from assignment_2.simulation import QueueSimulator
-from assignment_2.dist.Distribution import Distribution
+from assignment_2.simulator import QueueSimulator
 
 
 class TestSimulator:
@@ -16,14 +16,7 @@ class TestSimulator:
         """
         Creates a game state object.
         """
-        distributions = [Distribution(stats.poisson(1))]
-        distributions.append(Distribution(stats.expon(scale=1 / 80)))
-        distributions.append(Distribution(stats.geom(1 / 3)))
-        distributions.append(Distribution(stats.bernoulli(0.4)))
-        distributions.append(Distribution(stats.expon(scale=1 / 20)))
-        distributions.append(Distribution(stats.expon(scale=1 / 12)))
-
-        return QueueSimulator(distributions, 1, 3, False, False, 1)
+        return QueueSimulator(nr_servers=1, nr_queues=1, n_jobs=1)
 
     @pytest.fixture(autouse=True)
     def test_simulator_init(self, create_simulator):
@@ -31,7 +24,6 @@ class TestSimulator:
         Tests the initialization of the simulator.
         """
         assert create_simulator.sim_history is not None
-        assert create_simulator.parallelize is False
 
     def test_simulator_run(self, create_simulator):
         """
