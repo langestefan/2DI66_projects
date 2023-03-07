@@ -367,12 +367,12 @@ class QueueSimulator(Simulator):
         # run simulation once for each rate parameter
         for idx, dist in enumerate(self.arrival_time_dist):
             logger.debug(
-                f"Running new simulation {n} with rate parameter {idx}",
+                f"Running new simulation {n} with rate parameter: {c.MU_ARRIVAL_RATE_MIN[idx]} / min",
                 extra=self.logstr,
             )
             # initialize queues
-            for q in range(self.nr_queues):
-                self.queues[q] = CQueue(queue_id=q)
+            for q_id in range(self.nr_queues):
+                self.queues[q_id] = CQueue(queue_id=q_id)
 
             # initialize servers
             for s in range(self.nr_servers):
@@ -399,6 +399,7 @@ class QueueSimulator(Simulator):
         while t < c.SIM_T:
             # TODO: register canteen occupancy (number of customers in canteen)
             # TODO: register queue lengths
+            # TODO: register waiting times
 
             # get queue lengths
             q_lengths = self.get_queue_lengths()
@@ -414,14 +415,20 @@ class QueueSimulator(Simulator):
             if e.type == Event.ARRIVAL:
                 # get the queue with the shortest length
                 shortest = np.where(q_lengths == np.amin(q_lengths))[0]
-                q = random.choice(shortest)
+                q_id = random.choice(shortest)
                 logger.debug(
-                    f"Shortest queue: {shortest}, selected queue: {q}",
+                    f"Shortest queue: {shortest}, selected queue: {q_id}",
                     extra=self.logstr,
                 )
 
                 # add customer to queue object
-                self.queues[q].add_customer(q_id=q, customer=cust)  # type: ignore
+                self.queues[q_id].add_customer(customer=cust, q_id=q_id)  # type: ignore
+
+            # handle customer departure event
+            elif e.type == Event.DEPARTURE:
+                # get the queue the customer is in and remove the customer from that queue
+                q_id = cust.get_queue_id()
+                self.queues[q_id].remove_customer(customer=cust, q_id=q_id)  # type: ignore
 
     def create_new_group(self, t_arr: float, fes: FES) -> FES:
         """
@@ -453,7 +460,7 @@ class QueueSimulator(Simulator):
 
         :return: The current queue lengths stored in a numpy array.
         """
-        lengths = np.array([q.get_length() for q in self.queues])
+        lengths = np.array([q_id.get_length() for q_id in self.queues])
         logger.debug(f"Current queue lengths: {lengths}", extra=self.logstr)
 
         return lengths

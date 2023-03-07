@@ -17,12 +17,12 @@ class CQueue:
     def __str__(self):
         return "Queue length: " + str(self.get_length())
 
-    def add_customer(self, q_id: int, customer: Customer):
+    def add_customer(self, customer: Customer, q_id: int):
         """
         Adds a customer to the queue.
 
-        :param q_id: Queue ID to add customer to. Only used for sanity check.
         :param customer: Customer to add.
+        :param q_id: Queue ID to add customer to. Only used for sanity check.
         """
         if q_id != self.queue_id:
             raise ValueError("Queue ID does not match queue ID of queue.")
@@ -37,10 +37,13 @@ class CQueue:
             extra=self.logstr,
         )
 
-    def remove_customer(self, q_id: int):
+    def remove_customer(self, customer: Customer, q_id: int):
         """
         Removes a customer from the queue.
-        :return: Customer removed from queue.
+
+        :param customer: Customer to add.
+        :param q_id: Queue ID to add customer to. Only used for sanity check.
+        :return: Customer that was removed from queue.
         """
         if q_id != self.queue_id:
             raise ValueError("Queue ID does not match queue ID of queue.")
@@ -57,7 +60,16 @@ class CQueue:
             extra=self.logstr,
         )
 
-        return self.queue.popleft()
+        # at this point popleft will give us the customer at the front of the queue
+        # this customer must match the one we received from a DEPARTURE event
+        cust_front_q = self.queue.popleft()
+        if (
+            cust_front_q.get_t_done_grab() != customer.get_t_done_grab()
+        ):  # compare arrival timestamps
+            raise ValueError(
+                "Customer we want to remove is not the customer at the front"
+                " of the queue."
+            )
 
     def get_length(self):
         """
