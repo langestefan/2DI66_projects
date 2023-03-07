@@ -28,10 +28,7 @@ class Customer:
             raise ValueError("t_grab_food <= t_arr")
 
     def __str__(self):
-        return (
-            "with cash: "  # noqa: W503
-            + str(self.use_cash)  # noqa: W503
-        )
+        return "with cash: " + str(self.use_cash)  # noqa: W503  # noqa: W503
 
     def get_t_done_grab(self):
         """

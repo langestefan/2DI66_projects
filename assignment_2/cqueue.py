@@ -26,7 +26,7 @@ class CQueue:
         """
         if q_id != self.queue_id:
             raise ValueError("Queue ID does not match queue ID of queue.")
-        
+
         self.queue.append(customer)
         queue_length = self.get_length()
         logger.debug(
@@ -44,7 +44,7 @@ class CQueue:
         """
         if q_id != self.queue_id:
             raise ValueError("Queue ID does not match queue ID of queue.")
-        
+
         queue_length = self.get_length()
 
         if queue_length == 0:
