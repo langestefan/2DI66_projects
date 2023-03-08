@@ -20,7 +20,7 @@ MU_ARRIVAL_RATE_MIN = [1, 2, 3, 4]
 MU_ARRIVAL_RATE_SEC = [x / 60 for x in MU_ARRIVAL_RATE_MIN]
 
 # simulation duration 12:00 - 13:00 in seconds
-SIM_T = 600
+SIM_T = 3600
 
 # number of servers / queues
 N_SERVERS = 3
