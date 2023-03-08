@@ -10,9 +10,9 @@ class SimResults:
     def __init__(self, nr_queues):
         self.nrQueues = nr_queues
 
-        self.sumQL = np.zeros((self.nrQueues, 1))  # total sum of queue lengths
+        self.sumQL = np.zeros((1, self.nrQueues))  # total sum of queue lengths
         self.sumQL2 = np.zeros(
-            (self.nrQueues, 1)
+            (1, self.nrQueues)
         )  # total sum of queue lengths squared
         self.sumW = np.zeros((self.nrQueues, 1))  # total sum of waiting times
         self.sumW2 = np.zeros(
@@ -44,9 +44,9 @@ class SimResults:
         # occurred in one queue only
 
         # ql = queue length array
-        self.sumQL += ql * (time - self.oldTime)
-        self.sumQL2 += ql * ql * (time - self.oldTime)
-        self.hist_ql[self.nrEntries_ql, :] = ql
+        self.sumQL += np.array(ql * (time - self.oldTime))
+        self.sumQL2 += np.array(ql * ql * (time - self.oldTime))
+        #self.hist_ql[self.nrEntries_ql, :] = ql
         self.times.append(time)
         self.oldTime = time
 
@@ -59,7 +59,10 @@ class SimResults:
             )
 
     def register_waiting_time(self, w, q):
-        self.hist_w[self.nrEntries_w, q] = w
+        # w = waiting time 
+        # q = queue id 
+        
+        #self.hist_w[self.nrEntries_w, q] = w
         self.sumW[q] += w
         self.sumW2[q] += w * w
 
@@ -77,17 +80,17 @@ class SimResults:
     def register_group(self, g):
         self.group.append(g)
         # get_customers returns deque
-        self.customers += g.get_customers()
+        self.customers += [c for c in g.get_customers()]
 
     def register_sojourn_t(self, c):
         # TODO: Check variable names of customer
         # NOTE: c.arrivalTime is without grabTime!
-        self.sojournC.append(c.depTime - c.arrivalTime)
+        self.sojournC.append(c.get_t_left() - c.get_t_arrival())
 
         # TODO: Add all_left Boolean to check whether member of group left
-        if c.get_group.all_left:
+        #if c.get_group.all_left:
             # TODO: Add departure & arrival time of group to class Group
-            self.sojournG.append(c.get_group.depTime - c.get_group.arrivalTime)
+        #    self.sojournG.append(c.get_group.depTime - c.get_group.arrivalTime)
 
     def get_mean_ql(self):
         return self.sumQL / self.oldTime

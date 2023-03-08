@@ -350,7 +350,7 @@ class QueueSimulator(Simulator):
 
         # exponential distribution for the arrival time of a group
         self.arrival_time_dist = [
-            Distribution(stats.expon(scale=mu)) for mu in c.MU_ARRIVAL_RATE_SEC
+            Distribution(stats.expon(scale=1/mu)) for mu in c.MU_ARRIVAL_RATE_SEC
         ]
 
         # exponential distribution for the time it takes a customer to grab food
@@ -404,9 +404,9 @@ class QueueSimulator(Simulator):
                     queue.add_server(self.servers[s])
 
             # run simulation
-            self.simulate_queue()
+            self.simulate_queue(dist)
 
-    def simulate_queue(self) -> None:
+    def simulate_queue(self, dist) -> None:
         """
         Runs one full simulation.
 
@@ -414,24 +414,30 @@ class QueueSimulator(Simulator):
         """
         # debug variables to keep track of stuff
         n_arrivals = 0
+        n_arrivals_groups = 0
         n_departures = 0
+        
+        # dictionary to help keep track when to nr of customers to nr present 
+        # in canteen 
+        Narrival = {}
+        N = 0 # number of customers in canteen 
 
         # initialize simulation
         fes = FES()
         self.res = SimResults(self.queues.size)
         t = 0
 
-        # create first group and update the FES with new arrival events
+        # create first group, update the FES with new arrival events
+        # and intialize N as number of customers in canteen 
         fes = self.create_new_group(t_arr=t, fes=fes)
 
         # run simulation until t > SIM_T
         while t < c.SIM_T:
-            # TODO: register canteen occupancy (number of customers in canteen)
-            # TODO: register queue lengths
-            # TODO: register waiting times
+            # TODO: register sojourn time of group 
 
             # get queue lengths
             q_lengths = self.get_queue_lengths()
+            self.res.register_queue_length(t, q_lengths)
 
             # get next event from FES
             e = fes.next()  # jump to next event
@@ -440,8 +446,23 @@ class QueueSimulator(Simulator):
 
             logger.debug(f"Event: {e}", extra=self.logstr)
 
+            # handle group arrival event 
+            if e.type == Event.ARRIVAL_GROUP:
+                n_arrivals_groups += 1 
+                
+                logger.debug(
+                    f"--- ARRIVAL GROUP total: {n_arrivals_groups} ---",
+                    extra=self.logstr,
+                )
+                
+                # create new group and update the FES with new arrival events
+                t_arr_new = t+dist.rvs(1)
+                fes = self.create_new_group(t_arr=t_arr_new, fes=fes)
+                
+                N += e.get_customer().get_nr_customers()
+            
             # handle customer arrival event
-            if e.type == Event.ARRIVAL:
+            elif e.type == Event.ARRIVAL:
                 n_arrivals += 1
                 logger.debug(
                     f"--- ARRIVAL total: {n_arrivals} ---", extra=self.logstr
@@ -469,13 +490,17 @@ class QueueSimulator(Simulator):
                     t_service = t + server.get_service_time(
                         cust.get_uses_cash()
                     )
+                    logger.debug(f"Scheduled new DEPARTURE {t_service}", extra=self.logstr)
 
                     # schedule departure event
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
-
-                # create new group and update the FES with new arrival events
-                fes = self.create_new_group(t_arr=t, fes=fes)
+                    
+                    # register waiting time 
+                    self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
+                    
+                    # register sojourn time 
+                    self.res.register_sojourn_t(cust)
 
             # handle customer departure event
             elif e.type == Event.DEPARTURE:
@@ -488,6 +513,12 @@ class QueueSimulator(Simulator):
                 # TODO: do we check each queue if the customer is there or do we just store the queue id in the customer obj?
                 q_id = cust.get_queue_id()
                 self.queues[q_id].remove_customer(customer=cust, q_id=q_id)  # type: ignore
+                N -= 1 # update number of customers in canteen 
+                
+                logger.debug(
+                    f"Current number of customers in canteen: {N}",
+                    extra = self.logstr,
+                )
 
                 # if there are customers waiting we schedule a departure event for the next customer
                 nr_servers = self.queues[q_id].get_n_servers()  # type: ignore
@@ -511,6 +542,9 @@ class QueueSimulator(Simulator):
                     # schedule departure event
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
+                    
+                    # register waiting time 
+                    self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
 
             # log the FES / debug sleep
             if c.LOG_FES:
@@ -533,6 +567,12 @@ class QueueSimulator(Simulator):
 
         # create group of customers
         group = Group(n_customers, use_cash, t_arr, t_grab)
+        
+        # register group 
+        self.res.register_group(group)
+        
+        # add group arrival to FES
+        fes.add(Event(Event.ARRIVAL_GROUP, t_arr, group))
 
         # create an arrival event for each customer in the group, and add it to the FES
         for idx, customer in enumerate(group.get_customers()):

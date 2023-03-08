@@ -4,6 +4,7 @@ from assignment_2.customer import Customer
 class Event:
     ARRIVAL = 0
     DEPARTURE = 1
+    ARRIVAL_GROUP = 2
 
     def __init__(self, typ: int, time: float, cust: Customer):
         """_summary_
@@ -21,7 +22,7 @@ class Event:
         return self.time < other.time
 
     def __str__(self):
-        s = ("Arrival", "Departure")
+        s = ("Arrival", "Departure", "Arrival group")
         return (
             s[self.type]
             + " of customer "  # noqa: W503
