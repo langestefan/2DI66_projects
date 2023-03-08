@@ -452,13 +452,10 @@ class QueueSimulator(Simulator):
 
             # run simulation
             self.simulate_queue(dist)
-<<<<<<< HEAD
-            
+
             res[idx] = self.res
             
         return res
-=======
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
 
     def simulate_queue(self, dist) -> None:
         """
@@ -471,14 +468,8 @@ class QueueSimulator(Simulator):
         n_arrivals_groups = 0
         n_departures = 0
         
-<<<<<<< HEAD
-=======
-        # dictionary to help keep track when to nr of customers to nr present 
-        # in canteen 
-        Narrival = {}
         N = 0 # number of customers in canteen 
 
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
         # initialize simulation
         fes = FES()
         self.res = SimResults(self.queues.size)
@@ -494,11 +485,6 @@ class QueueSimulator(Simulator):
 
         # run simulation until t > SIM_T
         while t < c.SIM_T:
-<<<<<<< HEAD
-=======
-            # TODO: register sojourn time of group 
-
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
             # get queue lengths
             q_lengths = self.get_queue_lengths()
             self.res.register_queue_length(t, q_lengths)
@@ -523,13 +509,9 @@ class QueueSimulator(Simulator):
                 t_arr_new = t+dist.rvs(1)
                 fes = self.create_new_group(t_arr=t_arr_new, fes=fes)
                 
-<<<<<<< HEAD
                 # register number of customers in canteen 
                 N += e.get_customer().get_nr_customers()
                 self.res.register_canteen(t, N)
-=======
-                N += e.get_customer().get_nr_customers()
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
             
             # handle customer arrival event
             elif e.type == Event.ARRIVAL:
@@ -565,10 +547,7 @@ class QueueSimulator(Simulator):
                     # schedule departure event
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
-<<<<<<< HEAD
                     cust.set_t_left(t_service)
-=======
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
                     
                     # register waiting time 
                     self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
@@ -587,14 +566,10 @@ class QueueSimulator(Simulator):
                 # TODO: do we check each queue if the customer is there or do we just store the queue id in the customer obj?
                 q_id = cust.get_queue_id()
                 self.queues[q_id].remove_customer(customer=cust, q_id=q_id)  # type: ignore
-<<<<<<< HEAD
                 
                 # register number of customers in canteen 
                 N -= 1 
                 self.res.register_canteen(t, N)
-=======
-                N -= 1 # update number of customers in canteen 
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
                 
                 logger.debug(
                     f"Current number of customers in canteen: {N}",
@@ -623,7 +598,6 @@ class QueueSimulator(Simulator):
                     # schedule departure event
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
-<<<<<<< HEAD
                     cust.set_t_left(t_service)
                     
                     # register waiting time 
@@ -631,11 +605,9 @@ class QueueSimulator(Simulator):
                     
                     # register sojourn time 
                     self.res.register_sojourn_t(cust)
-=======
                     
                     # register waiting time 
                     self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
 
             # log the FES / debug sleep
             if c.LOG_FES:

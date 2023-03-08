@@ -13,10 +13,7 @@ class SimResults:
         """
         self.nrQueues = nr_queues
 
-<<<<<<< HEAD
         # storing values related to queue length 
-=======
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
         self.sumQL = np.zeros((1, self.nrQueues))  # total sum of queue lengths
         self.sumQL2 = np.zeros(
             (1, self.nrQueues)
@@ -51,7 +48,6 @@ class SimResults:
         self.sojournG = deque()
 
     def register_queue_length(self, time, ql):
-<<<<<<< HEAD
         """
         Registers queue length 
         
@@ -67,15 +63,10 @@ class SimResults:
         for q in range(len(ql)):
             self.histQL[min(ql[q], self.MAX_ENTRIES), q] += (time - self.oldTime)
             
-=======
         # queue length registered at each change, even if change only
         # occurred in one queue only
-
-        # ql = queue length array
         self.sumQL += np.array(ql * (time - self.oldTime))
         self.sumQL2 += np.array(ql * ql * (time - self.oldTime))
-        #self.hist_ql[self.nrEntries_ql, :] = ql
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
         self.times.append(time)
         self.oldTime = time
 
@@ -86,7 +77,6 @@ class SimResults:
             )
 
     def register_waiting_time(self, w, q):
-<<<<<<< HEAD
         """
         Registers waiting time
         
@@ -95,12 +85,6 @@ class SimResults:
         """
         # update parameters 
         self.allW.append(w)
-=======
-        # w = waiting time 
-        # q = queue id 
-        
-        #self.hist_w[self.nrEntries_w, q] = w
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
         self.sumW[q] += w
         self.sumW2[q] += w * w
         self.nW += 1
@@ -123,7 +107,6 @@ class SimResults:
         self.canteen.append(n)
 
     def register_group(self, g):
-<<<<<<< HEAD
         """
         Registers group and corresponding customer objects
         
@@ -151,21 +134,6 @@ class SimResults:
         if not g.group_in_canteen():
             g.set_t_departure(c.get_t_left())
             self.sojournG.append(c.get_t_left()-g.get_t_arrival())
-=======
-        self.group.append(g)
-        # get_customers returns deque
-        self.customers += [c for c in g.get_customers()]
-
-    def register_sojourn_t(self, c):
-        # TODO: Check variable names of customer
-        # NOTE: c.arrivalTime is without grabTime!
-        self.sojournC.append(c.get_t_left() - c.get_t_arrival())
-
-        # TODO: Add all_left Boolean to check whether member of group left
-        #if c.get_group.all_left:
-            # TODO: Add departure & arrival time of group to class Group
-        #    self.sojournG.append(c.get_group.depTime - c.get_group.arrivalTime)
->>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
 
     def get_mean_ql(self):
         return self.sumQL / self.oldTime

@@ -21,7 +21,7 @@ os.system("")
 
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 1
-    n_sims = 1000
+    n_sims = 1
 
     # Start logging
     logger = logging.getLogger(__name__)
