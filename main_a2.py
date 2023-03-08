@@ -1,4 +1,3 @@
-import multiprocessing as mp
 import logging
 import os
 
@@ -7,7 +6,7 @@ import assignment_2.simulator as sim
 import assignment_2.constants as c
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=c.LOG_LEVEL,
     format=(
         "[%(asctime)s] %(levelname)s [%(name)s::%(className)s:%(lineno)s]"
         " %(message)s"

@@ -426,7 +426,6 @@ class QueueSimulator(Simulator):
 
         # run simulation until t > SIM_T
         while t < c.SIM_T:
-            time.sleep(0.5)
             # TODO: register canteen occupancy (number of customers in canteen)
             # TODO: register queue lengths
             # TODO: register waiting times
@@ -513,9 +512,11 @@ class QueueSimulator(Simulator):
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
 
-            # log the FES
+            # log the FES / debug sleep
             if c.LOG_FES:
                 logger.debug(f"FES: \n{fes}", extra=self.logstr)
+            if c.DEBUG_THROTTLE is True:
+                time.sleep(c.TIME_SLEEP)
 
     def create_new_group(self, t_arr: float, fes: FES) -> FES:
         """
