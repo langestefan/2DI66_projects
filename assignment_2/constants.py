@@ -2,7 +2,7 @@
 import logging
 
 # bernoulli probability of cash payment
-P_CASH = 0.4
+P_CASH = 0
 
 # p value for geometric distribution of group size
 P_GROUP_SIZE = 1 / 3
