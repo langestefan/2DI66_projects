@@ -422,6 +422,7 @@ class QueueSimulator(Simulator):
         # run simulation until t > SIM_T
         while t < c.SIM_T:
             time.sleep(0.5)
+            logger.debug(f'FES: \n{fes}', extra=self.logstr)
             # TODO: register canteen occupancy (number of customers in canteen)
             # TODO: register queue lengths
             # TODO: register waiting times
