@@ -492,7 +492,14 @@ class QueueSimulator(Simulator):
 
                 # if there are customers waiting we schedule a departure event for the next customer
                 nr_servers = self.queues[q_id].get_n_servers()  # type: ignore
-                if self.queues[q_id].get_length() >= nr_servers:  # type: ignore
+                q_length = self.queues[q_id].get_length()  # type: ignore
+
+                # TODO: somehow this is almost never triggered?
+                if q_length >= nr_servers:
+                    logging.debug(
+                        f"Queue {q_id} has more customers than servers",
+                        extra=self.logstr,
+                    )
                     # get the next customer in the queue
                     cust = self.queues[q_id].get_customer_at_pos(pos=nr_servers - 1)  # type: ignore
 
@@ -507,7 +514,8 @@ class QueueSimulator(Simulator):
                     fes.add(dep_event)
 
             # log the FES
-            logger.debug(f"FES: \n{fes}", extra=self.logstr)
+            if c.LOG_FES:
+                logger.debug(f"FES: \n{fes}", extra=self.logstr)
 
     def create_new_group(self, t_arr: float, fes: FES) -> FES:
         """

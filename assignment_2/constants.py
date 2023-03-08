@@ -24,3 +24,6 @@ SIM_T = 3600
 # number of servers / queues
 N_SERVERS = 3
 N_QUEUES = 3
+
+# print FES
+LOG_FES = False
