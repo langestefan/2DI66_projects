@@ -1,0 +1,390 @@
+[33mcommit 3b9c24413863fd3beeff3585a3f1c02033fee705[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Wed Mar 8 21:47:00 2023 +0100
+
+    Adjusted SimResults and added some visualizations
+
+:100644 000000 1ef4bf9 0000000 D	assignment_2/data/logger_n=1000.pkl
+:100644 000000 97e4492 0000000 D	assignment_2/data/results_n=1000.pkl
+:100644 000000 ca1da7d 0000000 D	assignment_2/data/simulator=1000.pkl
+
+[33mcommit 5b34436c5a43d23ed982c19a07ce818268ae8298[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Wed Mar 8 21:37:56 2023 +0100
+
+    Adjusted SimResults and added visualizations
+
+:000000 100644 0000000 0df95c1 A	assignment_2/analysis.py
+:000000 100644 0000000 1ef4bf9 A	assignment_2/data/logger_n=1000.pkl
+:000000 100644 0000000 97e4492 A	assignment_2/data/results_n=1000.pkl
+:000000 100644 0000000 ca1da7d A	assignment_2/data/simulator=1000.pkl
+:100644 100644 59f9bde 6c37aae M	assignment_2/event.py
+:100644 100644 41bb279 9ee8638 M	assignment_2/group.py
+:100644 100644 2c82288 8873879 M	assignment_2/simresults.py
+:100644 100644 856cb6a 80fd3b2 M	assignment_2/simulator.py
+:100644 100644 8041a96 3bb8cf4 M	main_a2.py
+
+[33mcommit 394ca6d2955bb9d391c4a44738d16f3cf3939e3c[m[33m ([m[1;31morigin/slow_server[m[33m, [m[1;31morigin/single_queue[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Wed Mar 8 11:01:37 2023 +0100
+
+    Added new type EVENT and some registrations into SimResults
+
+:100644 100644 3bdecd8 5f420b4 M	assignment_2/customer.py
+:100644 100644 90fdb85 59f9bde M	assignment_2/event.py
+:100644 100644 6adfb66 2c82288 M	assignment_2/simresults.py
+:100644 100644 af65b8b 856cb6a M	assignment_2/simulator.py
+
+[33mcommit 3d1f727cf6d9aa87425f716e6b5af32776c3698e[m
+Author: Stefan <langestefan@msn.com>
+Date:   Wed Mar 8 01:28:17 2023 +0100
+
+    Add some debugging parameters
+
+:100644 100644 d5f1154 8aa36a8 M	assignment_2/constants.py
+:100644 100644 57701bd af65b8b M	assignment_2/simulator.py
+:100644 100644 0e2e469 8041a96 M	main_a2.py
+
+[33mcommit 16cda6ad22dddf4611653ebbc70488d1184c6343[m
+Author: Stefan <langestefan@msn.com>
+Date:   Wed Mar 8 01:21:53 2023 +0100
+
+    Add debug string LOG_FES
+
+:100644 100644 bcd8bcb d5f1154 M	assignment_2/constants.py
+:100644 100644 a943b63 57701bd M	assignment_2/simulator.py
+
+[33mcommit b1a00039b90d447a7095eff6227e968181a8922e[m
+Author: Stefan <langestefan@msn.com>
+Date:   Wed Mar 8 01:11:40 2023 +0100
+
+    Update formatting
+
+:100644 100644 c8ba8a6 bcd8bcb M	assignment_2/constants.py
+:100644 100644 878ddf5 8cf5a5b M	assignment_2/cqueue.py
+:100644 100644 fbb34be 3bdecd8 M	assignment_2/customer.py
+:100644 100644 d88a4fe 41bb279 M	assignment_2/group.py
+:100644 100644 81df5f6 d940a8a M	assignment_2/server.py
+:100644 100644 61d871a a943b63 M	assignment_2/simulator.py
+:100644 100644 8873691 0e2e469 M	main_a2.py
+
+[33mcommit 3559632183415497165b01b3f561518630d17c79[m
+Author: Stefan <langestefan@msn.com>
+Date:   Wed Mar 8 01:00:30 2023 +0100
+
+    Log FES
+
+:100644 100644 bf05842 61d871a M	assignment_2/simulator.py
+
+[33mcommit f07111ce1b1c6b30ce345655fba94b1d4cf5bb88[m
+Author: Stefan <langestefan@msn.com>
+Date:   Wed Mar 8 00:55:26 2023 +0100
+
+    Finish basic simulation
+
+:100644 100644 43e207a c8ba8a6 M	assignment_2/constants.py
+:100644 100644 b67806d 878ddf5 M	assignment_2/cqueue.py
+:100644 100644 f4a2931 fbb34be M	assignment_2/customer.py
+:100644 100644 1aa27c0 d88a4fe M	assignment_2/group.py
+:100644 100644 e740a0e 81df5f6 M	assignment_2/server.py
+:100644 100644 352a911 bf05842 M	assignment_2/simulator.py
+:100644 100644 bd480f0 8873691 M	main_a2.py
+
+[33mcommit c58a72b0029a2825d26e6138089df4b30bdc3981[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 18:34:57 2023 +0100
+
+    Add queue length and map server to queue
+
+:100644 100644 5976f6c 43e207a M	assignment_2/constants.py
+:100644 100644 31a3f86 b67806d M	assignment_2/cqueue.py
+:100644 100644 e512be7 352a911 M	assignment_2/simulator.py
+
+[33mcommit ba97755cb5d43b96be30670bb958b7c943f97d4a[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 17:42:58 2023 +0100
+
+    Start implementation of departure event
+
+:100644 100644 f04a2b3 31a3f86 M	assignment_2/cqueue.py
+:100644 100644 5b726d4 e740a0e M	assignment_2/server.py
+:100644 100644 73db788 e512be7 M	assignment_2/simulator.py
+
+[33mcommit 7a5991accfd8fa1fa4f9c75f5fe183519a852f5b[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 17:21:06 2023 +0100
+
+    Format files
+
+:100644 100644 b2fc423 f04a2b3 M	assignment_2/cqueue.py
+:100644 100644 ed29dd3 f4a2931 M	assignment_2/customer.py
+
+[33mcommit fc1d05b449d6ac47966f47d4cf3581c07da84be8[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 17:18:09 2023 +0100
+
+    Add queue length
+
+:100644 100644 8bbe29a b2fc423 M	assignment_2/cqueue.py
+:100644 100644 a3d1b27 ed29dd3 M	assignment_2/customer.py
+:100644 100644 c42e566 90fdb85 M	assignment_2/event.py
+:100644 100644 e69d6c0 1aa27c0 M	assignment_2/group.py
+:100644 100644 114d6b7 73db788 M	assignment_2/simulator.py
+
+[33mcommit 2c40caae7d4354bce527962784824471b5894076[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 15:57:31 2023 +0100
+
+    Start arrival event handler
+
+:100644 100644 14012b2 5976f6c M	assignment_2/constants.py
+:100644 100644 9f62f2c 8bbe29a M	assignment_2/cqueue.py
+:100644 100644 af342dc a3d1b27 M	assignment_2/customer.py
+:100644 100644 0a54b09 c42e566 M	assignment_2/event.py
+:100644 100644 af4ce81 e69d6c0 M	assignment_2/group.py
+:100644 100644 8585a11 6adfb66 M	assignment_2/simresults.py
+:100644 100644 f3ae6ab 114d6b7 M	assignment_2/simulator.py
+:100644 100644 5598b74 bd480f0 M	main_a2.py
+
+[33mcommit 323a1e34b610aca295e27b25dc81c95ca74ed228[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 15:56:57 2023 +0100
+
+    Add tests for customer and groups
+
+:000000 100644 0000000 ab2d606 A	test/ass2/test_customer.py
+:100644 100644 b8bec30 115aa04 M	test/ass2/test_group.py
+
+[33mcommit 08cc7a5a9299663c1e407479b4f0f7d0780b9fd6[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 02:07:55 2023 +0100
+
+    Replace simulation.py with simulator.py
+
+:100644 000000 c54b473 0000000 D	assignment_2/simulation.py
+:100644 100644 2475fe3 f3ae6ab M	assignment_2/simulator.py
+:100644 100644 58c31ba 9d0426b M	test/ass2/test_simulator.py
+
+[33mcommit a2102a533e2ba510e3ad1226705eae73c4cc74e8[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 02:07:39 2023 +0100
+
+    Add customer class
+
+:100644 100644 4b83285 af342dc M	assignment_2/customer.py
+
+[33mcommit 92e65721638621af242d1c403bebeb081d0dd00c[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 02:07:31 2023 +0100
+
+    Add group class
+
+:100644 100644 0e425b2 af4ce81 M	assignment_2/group.py
+:100644 100644 d70f830 b8bec30 M	test/ass2/test_group.py
+
+[33mcommit 97cf988289cc9b92932b78791ec95c720af8ea5c[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 02:07:20 2023 +0100
+
+    Add server class
+
+:100644 100644 e69de29 5b726d4 M	assignment_2/server.py
+
+[33mcommit e12ea40c8dc52031128aac349d6fc1e3bd90d868[m
+Author: Stefan <langestefan@msn.com>
+Date:   Tue Mar 7 02:07:08 2023 +0100
+
+    Add queue class
+
+:000000 100644 0000000 9f62f2c A	assignment_2/cqueue.py
+:100644 000000 e69de29 0000000 D	assignment_2/pqueue.py
+
+[33mcommit 673dc51947324cb8ed83b8bb6538c22f9c4d10a8[m
+Author: Stefan <langestefan@msn.com>
+Date:   Mon Mar 6 21:58:49 2023 +0100
+
+    Add files for assignment 2
+
+:100644 000000 8a36009 0000000 D	assignment_1/old/Piece.py
+:100644 000000 50479e6 0000000 D	assignment_1/old/Piece_comments.txt
+:100644 100644 c9a9af8 4b83285 M	assignment_2/customer.py
+:100644 100644 61a9d3f 0a54b09 M	assignment_2/event.py
+:100644 100644 dc10528 bead8c6 M	assignment_2/fes.py
+:100644 100644 3abba40 0e425b2 M	assignment_2/group.py
+:100644 100644 e69de29 e69de29 R100	assignment_2/queue.py	assignment_2/pqueue.py
+:100644 100644 bedcdb7 8585a11 M	assignment_2/simresults.py
+:100644 100644 1581f30 c54b473 M	assignment_2/simulation.py
+:100644 100644 5d7036a 2475fe3 M	assignment_2/simulator.py
+
+[33mcommit 659c9328953d55d4fe770564452dab12734a2c52[m
+Author: Stefan <langestefan@msn.com>
+Date:   Mon Mar 6 21:58:35 2023 +0100
+
+    Add constants for ass 2
+
+:000000 100644 0000000 14012b2 A	assignment_2/constants.py
+
+[33mcommit 45fa2376f9044b52fdb6d88b33339f0af2ca5800[m
+Author: Stefan <langestefan@msn.com>
+Date:   Mon Mar 6 21:58:25 2023 +0100
+
+    Add stats dist package from lecture notes
+
+:100644 100644 5313b0d f9e06a3 M	.gitignore
+:000000 100644 0000000 e69de29 A	dist/__init__.py
+:000000 100644 0000000 5526d49 A	dist/distribution.py
+
+[33mcommit 09281fbd0cca01b288f0274540b41fa42d3e362b[m
+Author: Stefan <langestefan@msn.com>
+Date:   Mon Mar 6 21:57:58 2023 +0100
+
+    Add tests
+
+:000000 100644 0000000 e69de29 A	test/ass1/__init__.py
+:100644 100644 5a0908c 5a0908c R100	test_1/conftest.py	test/ass1/conftest.py
+:100644 100644 2d2761f 2d2761f R100	test/debug_Piece.py	test/ass1/debug_Piece.py
+:100644 100644 0588993 0e38e88 R096	test_1/test_board.py	test/ass1/test_board.py
+:100644 100644 b9d6a83 86d8331 R095	test/test_game_state.py	test/ass1/test_game_state.py
+:100644 100644 cf1d555 fbc58b1 R098	test_1/test_pieces.py	test/ass1/test_pieces.py
+:100644 100644 2a9a885 ee35b41 R089	test/test_simulator.py	test/ass1/test_simulator.py
+:100644 100644 d4e7d44 ac8006f R088	test/test_strategy.py	test/ass1/test_strategy.py
+:000000 100644 0000000 e69de29 A	test/ass2/__init__.py
+:100644 100644 5a0908c 5a0908c R100	test_2/conftest.py	test/ass2/conftest.py
+:000000 100644 0000000 d70f830 A	test/ass2/test_group.py
+:100644 100644 0cb5841 58c31ba R066	test_2/test_simulator.py	test/ass2/test_simulator.py
+:100644 000000 e091009 0000000 D	test/conftest.py
+:100644 000000 0588993 0000000 D	test/test_board.py
+:100644 000000 cf1d555 0000000 D	test/test_pieces.py
+:100644 000000 2d2761f 0000000 D	test_1/debug_Piece.py
+:100644 000000 c500a46 0000000 D	test_1/test_game_state.py
+:100644 000000 2a9a885 0000000 D	test_1/test_simulator.py
+:100644 000000 d4e7d44 0000000 D	test_1/test_strategy.py
+
+[33mcommit f10bc55dcd1d53253f31c04bc2e7df5a9f03d576[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Mar 6 20:16:45 2023 +0100
+
+    Added todo
+
+:100644 100644 4902abd 1581f30 M	assignment_2/simulation.py
+
+[33mcommit 82fa29d735d660beb44f857fd08848ddbd8eeaf0[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Mar 6 17:20:55 2023 +0100
+
+    Added distribution method
+
+:000000 100644 0000000 6120631 A	assignment_2/dist/Distribution.py
+:000000 100644 0000000 9bf3447 A	assignment_2/dist/__pycache__/Distribution.cpython-37.pyc
+:000000 100644 0000000 7b1654d A	assignment_2/dist/__pycache__/Distribution.cpython-39.pyc
+
+[33mcommit fac91e919d64eb4f4b749666638173d59f1ebcb0[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Mar 6 17:20:08 2023 +0100
+
+    Added simulator (renamed to distinguish who made what) and simresults
+
+:000000 100644 0000000 bedcdb7 A	assignment_2/simresults.py
+:000000 100644 0000000 4902abd A	assignment_2/simulation.py
+
+[33mcommit ed3500ac468cea15f8ac9008ff8616197966ce79[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Mar 6 17:19:03 2023 +0100
+
+    Added some given files
+
+:000000 100644 0000000 61a9d3f A	assignment_2/event.py
+:000000 100644 0000000 dc10528 A	assignment_2/fes.py
+
+[33mcommit ca00e894bbd857115f3bc5a6a2c940a44826153f[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Mar 6 17:18:09 2023 +0100
+
+    Added tests for assignment 2
+
+:000000 100644 0000000 5a0908c A	test_2/conftest.py
+:000000 100644 0000000 0cb5841 A	test_2/test_simulator.py
+
+[33mcommit 8370829ace6fa34046620e61a97883478b71ef47[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Mar 6 17:17:36 2023 +0100
+
+    Changed folder name
+
+:000000 100644 0000000 5a0908c A	test_1/conftest.py
+:000000 100644 0000000 2d2761f A	test_1/debug_Piece.py
+:000000 100644 0000000 0588993 A	test_1/test_board.py
+:000000 100644 0000000 c500a46 A	test_1/test_game_state.py
+:000000 100644 0000000 cf1d555 A	test_1/test_pieces.py
+:000000 100644 0000000 2a9a885 A	test_1/test_simulator.py
+:000000 100644 0000000 d4e7d44 A	test_1/test_strategy.py
+
+[33mcommit ff3c70dd215532a9d5ebc3afc4555fdf944d26bb[m
+Author: Stefan <langestefan@msn.com>
+Date:   Sun Mar 5 20:11:19 2023 +0100
+
+    Update customer and group classes
+
+:100644 100644 e69de29 c9a9af8 M	assignment_2/customer.py
+:100644 100644 e69de29 3abba40 M	assignment_2/group.py
+
+[33mcommit cc6a9d3b57aa49db6e95aa64410f8ad296a3ccce[m
+Author: Stefan <langestefan@msn.com>
+Date:   Sun Mar 5 20:11:10 2023 +0100
+
+    Formatting
+
+:100644 100644 549d599 5d7036a M	assignment_2/simulator.py
+:100644 100644 0f40dcd 5598b74 M	main_a2.py
+
+[33mcommit f9f67f149d37d8c356e265190f1ea8f0c7b25863[m
+Author: Stefan <langestefan@msn.com>
+Date:   Sun Mar 5 19:44:51 2023 +0100
+
+    Make a skeleton for assignment 2
+
+:000000 100644 0000000 e69de29 A	assignment_2/__init__.py
+:000000 100644 0000000 e69de29 A	assignment_2/customer.py
+:000000 100644 0000000 e69de29 A	assignment_2/group.py
+:000000 100644 0000000 e69de29 A	assignment_2/queue.py
+:000000 100644 0000000 e69de29 A	assignment_2/server.py
+:000000 100644 0000000 549d599 A	assignment_2/simulator.py
+:100644 100644 c57e846 c57e846 R100	main.py	main_a1.py
+:000000 100644 0000000 0f40dcd A	main_a2.py
+
+[33mcommit 53e7c99642134657c1e21b574a5df307a1cdee92[m
+Author: Stefan <langestefan@msn.com>
+Date:   Sun Mar 5 15:11:04 2023 +0100
+
+    Run black formatter
+
+:100644 100644 8a8d2cd 62f7272 M	assignment_1/Analysis.py
+:100644 100644 bf7d92c 7c7defc M	assignment_1/board.py
+:100644 100644 fd78f91 e4c3a06 M	assignment_1/constants.py
+:100644 100644 e0eeb81 9928363 M	assignment_1/pieces.py
+:100644 100644 0af9747 ee1bdf6 M	assignment_1/simulator.py
+:100644 100644 200d853 c57e846 M	main.py
+
+[33mcommit 3f9668fd33c8fa958c1bdc1206f1ad277be17c46[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Feb 20 18:27:59 2023 +0100
+
+    Adjusted path directory + small error at rounds
+
+:100644 100644 ed8876b 8a8d2cd M	assignment_1/Analysis.py
+
+[33mcommit 2d7fe0fea0827b6e1143773beb66c8268931b04b[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Feb 20 18:19:30 2023 +0100
+
+    Changed path directory
+
+:100644 100644 ab76ca1 ed8876b M	assignment_1/Analysis.py
+
+[33mcommit 9229ffc3955088beb9a04525cece9c3acdfb6b13[m
+Author: Bi-rong Wang <birongwang01@gmail.com>
+Date:   Mon Feb 20 18:17:50 2023 +0100
+
+    Changed path directory
+
+:100644 100644 34f1631 ab76ca1 M	assignment_1/Analysis.py

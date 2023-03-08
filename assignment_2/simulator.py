@@ -50,70 +50,95 @@ class SimHistory:
 
     def add_sim_run(self, sim_result):
         """
-        Adds a game run to the game runs.
+        Adds a simulation run to the sim runs.
 
-        :param game_run: The game run to be added.
+        :param sim_results: The simulation run to be added.
         """
         self.sim_runs.append(sim_result)
         self.nr_simulations += 1
 
     def get_sim_runs(self) -> list:
         """
-        Returns the list containing all game runs.
+        Returns the list containing all simulation runs.
 
-        :return: The game runs.
+        :return: The simulation runs.
         """
         return self.sim_runs
 
     def get_number_of_simulations(self) -> int:
         """
-        Returns the number of games played.
+        Returns the number of simulations.
 
-        :return: The number of games played.
+        :return: The number of simulations.
         """
         return self.nr_simulations
 
-    def get_statistics_all(self) -> dict:
-        # for all queues together
+    def get_statistics_all(self, lam) -> dict:
+        """
+        Gathers statistics of results for all queues together
+        
+        :param lam: Index of rate parameter value for which statistics needs
+            to be calculated 
+            
+        :return: Dictionary with statistics
+        """
         statistics = {
-            "QueueLengths_all": deque(),
+            "QueueLengths_all": deque(), # list of all means 
             "QueueLength_mean": 0.0,
             "QueueLength_std": 0.0,
             "QueueLength_normal_ci_95": 0.0,
-            "WaitingTimes_all": deque(),
+            "QueueLength_hist": np.zeros(SimResults.MAX_ENTRIES+1), # hist plot data
+            "WaitingTime_all": deque(), # list of all  means 
             "WaitingTime_mean": 0.0,
             "WaitingTime_std": 0.0,
             "WaitingTime_normal_ci_95": 0.0,
-            "CustomersCanteen_all": deque(),
+            "CustomersCanteen_all": deque(), # list of all means 
+            "CustomersCanteen_values": deque(), # list of all values (not averages)
+            "CustomersCanteen_times": deque(), # list of time corresponding with _values
             "CustomersCanteen_mean": 0.0,
             "CustomersCanteen_std": 0.0,
-            "CustomersCanteen_ci_95": 0.0,
-            "SojournTimeCustomer_all": deque(),
+            "CustomersCanteen_normal_ci_95": 0.0,
+            "SojournTimeCustomer_all": deque(), # list of all means
             "SojournTimeCustomer_mean": 0.0,
             "SojournTimeCustomer_std": 0.0,
             "SojournTimeCustomer_normal_ci_95": 0.0,
-            "SojournTimeGroup_all": deque(),
+            "SojournTimeGroup_all": deque(), # list of all means 
             "SojournTimeGroup_mean": 0.0,
             "SojournTimeGroup_std": 0.0,
             "SojournTimeGroup_normal_ci_95": 0.0,
         }
-
+        
+        # go over all simulation runs 
         for i, simulation in enumerate(self.sim_runs):
-            allQL = simulation.getMeanQueueLength()
-            allWT = simulation.getMeanWaitingTime()
-
+            simulation = simulation[lam] # get simulation with correct rate parameter
+            
+            # update statistics
+            allQL = simulation.get_mean_ql()
+            allWT = simulation.get_mean_wait_t()
+            
             statistics["QueueLengths_all"].append(np.mean(allQL))
-            statistics["WaitingTimes_all"].append(np.mean(allWT))
+            for q in range(simulation.nrQueues):
+                statistics["QueueLength_hist"] += simulation.get_ql_hist(q)
+            
+            statistics["WaitingTime_all"].append(np.mean(allWT))
+            
             statistics["CustomersCanteen_all"].append(
-                simulation.getMeanCustomersCanteen()
+                simulation.get_mean_cust_canteen()
             )
+            statistics["CustomersCanteen_values"] += simulation.canteen
+            statistics["CustomersCanteen_times"] += simulation.canteen_times
+            
+            
             statistics["SojournTimeCustomer_all"].append(
-                simulation.getMeanSojournCustomer()
+                simulation.get_mean_sojourn_cust()
             )
             statistics["SojournTimeGroup_all"].append(
-                simulation.getMeanSojournGroup()
+                simulation.get_mean_sojourn_group()
             )
-
+        
+        statistics["QueueLength_hist"] = statistics["QueueLength_hist"]/(i+1)
+            
+        # calculate mean and std 
         statistics["QueueLength_mean"] = np.round(
             np.mean(statistics["QueueLengths_all"]), 3
         )
@@ -141,10 +166,11 @@ class SimHistory:
         statistics["SojournTimeGroup_mean"] = np.round(
             np.mean(statistics["SojournTimeGroup_all"]), 3
         )
-        statistics["SojournTimeGorup_std"] = np.round(
+        statistics["SojournTimeGroup_std"] = np.round(
             np.std(statistics["SojournTimeGroup_all"]), 3
         )
 
+        # calculate 95% confidence intervals
         statistics["QueueLength_normal_ci_95"] = self.__ci_normal(
             self.nr_simulations,
             statistics["QueueLength_mean"],
@@ -182,14 +208,24 @@ class SimHistory:
 
         return statistics
 
-    def get_statistics_separate(self, queue_nr) -> dict:
-        # per queue
+    def get_statistics_separate(self, lam, queue_nr) -> dict:
+        """
+        Gathers statistics of results for queues separately
+        
+        :param lam: Index of rate parameter value for which statistics needs
+            to be calculated 
+        :param queue_nr: Integer indicating for which queue statistics need to 
+            be calculated (same as queue_id)
+            
+        :return: Dictionary with statistics
+        """
         statistics = {
             "QueueLengths_all": deque(),
             "QueueLength_mean": 0.0,
             "QueueLength_std": 0.0,
             "QueueLength_normal_ci_95": 0.0,
-            "WaitingTimes_all": deque(),
+            "QueueLength_hist": np.zeros(SimResults.MAX_ENTRIES+1),
+            "WaitingTime_all": deque(),
             "WaitingTime_mean": 0.0,
             "WaitingTime_std": 0.0,
             "WaitingTime_normal_ci_95": 0.0,
@@ -197,14 +233,22 @@ class SimHistory:
 
         q = queue_nr
 
+        # iterate over all simulation runs 
         for i, simulation in enumerate(self.sim_runs):
+            simulation = simulation[lam]
+            
+            # update statistics 
             statistics["QueueLengths_all"].append(
-                simulation.getMeanQueueLength()[q]
+                simulation.get_mean_ql()[0][q]
             )
-            statistics["WaitingTimes_all"].append(
-                simulation.getMeanWaitingTime()[q]
+            statistics["WaitingTime_all"].append(
+                simulation.get_mean_wait_t()[q][0]
             )
+            statistics["QueueLength_hist"]+=simulation.get_ql_hist(queue_nr)
+            
+        statistics["QueueLength_hist"] = statistics["QueueLength_hist"]/(i+1)
 
+        # calculate mean and std 
         statistics["QueueLength_mean"] = np.round(
             np.mean(statistics["QueueLengths_all"]), 3
         )
@@ -218,6 +262,7 @@ class SimHistory:
             np.std(statistics["WaitingTime_all"]), 3
         )
 
+        # calculate 95% confidence intervals
         statistics["QueueLength_normal_ci_95"] = self.__ci_normal(
             self.nr_simulations,
             statistics["QueueLength_mean"],
@@ -350,7 +395,7 @@ class QueueSimulator(Simulator):
 
         # exponential distribution for the arrival time of a group
         self.arrival_time_dist = [
-            Distribution(stats.expon(scale=mu)) for mu in c.MU_ARRIVAL_RATE_SEC
+            Distribution(stats.expon(scale=1/mu)) for mu in c.MU_ARRIVAL_RATE_SEC
         ]
 
         # exponential distribution for the time it takes a customer to grab food
@@ -370,6 +415,8 @@ class QueueSimulator(Simulator):
         :param n: The number of the simulation run.
         :return: The simulation results.
         """
+        res = np.empty(len(self.arrival_time_dist), dtype = SimResults)
+        
         # run simulation once for each rate parameter
         for idx, dist in enumerate(self.arrival_time_dist):
             logger.debug(
@@ -404,9 +451,16 @@ class QueueSimulator(Simulator):
                     queue.add_server(self.servers[s])
 
             # run simulation
-            self.simulate_queue()
+            self.simulate_queue(dist)
+<<<<<<< HEAD
+            
+            res[idx] = self.res
+            
+        return res
+=======
+>>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
 
-    def simulate_queue(self) -> None:
+    def simulate_queue(self, dist) -> None:
         """
         Runs one full simulation.
 
@@ -414,24 +468,40 @@ class QueueSimulator(Simulator):
         """
         # debug variables to keep track of stuff
         n_arrivals = 0
+        n_arrivals_groups = 0
         n_departures = 0
+        
+<<<<<<< HEAD
+=======
+        # dictionary to help keep track when to nr of customers to nr present 
+        # in canteen 
+        Narrival = {}
+        N = 0 # number of customers in canteen 
 
+>>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
         # initialize simulation
         fes = FES()
         self.res = SimResults(self.queues.size)
         t = 0
+        
+        # number of customers in canteen 
+        N = 0 
+        self.res.register_canteen(t, N)
 
-        # create first group and update the FES with new arrival events
+        # create first group, update the FES with new arrival events
+        # and intialize N as number of customers in canteen 
         fes = self.create_new_group(t_arr=t, fes=fes)
 
         # run simulation until t > SIM_T
         while t < c.SIM_T:
-            # TODO: register canteen occupancy (number of customers in canteen)
-            # TODO: register queue lengths
-            # TODO: register waiting times
+<<<<<<< HEAD
+=======
+            # TODO: register sojourn time of group 
 
+>>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
             # get queue lengths
             q_lengths = self.get_queue_lengths()
+            self.res.register_queue_length(t, q_lengths)
 
             # get next event from FES
             e = fes.next()  # jump to next event
@@ -440,8 +510,29 @@ class QueueSimulator(Simulator):
 
             logger.debug(f"Event: {e}", extra=self.logstr)
 
+            # handle group arrival event 
+            if e.type == Event.ARRIVAL_GROUP:
+                n_arrivals_groups += 1 
+                
+                logger.debug(
+                    f"--- ARRIVAL GROUP total: {n_arrivals_groups} ---",
+                    extra=self.logstr,
+                )
+                
+                # create new group and update the FES with new arrival events
+                t_arr_new = t+dist.rvs(1)
+                fes = self.create_new_group(t_arr=t_arr_new, fes=fes)
+                
+<<<<<<< HEAD
+                # register number of customers in canteen 
+                N += e.get_customer().get_nr_customers()
+                self.res.register_canteen(t, N)
+=======
+                N += e.get_customer().get_nr_customers()
+>>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
+            
             # handle customer arrival event
-            if e.type == Event.ARRIVAL:
+            elif e.type == Event.ARRIVAL:
                 n_arrivals += 1
                 logger.debug(
                     f"--- ARRIVAL total: {n_arrivals} ---", extra=self.logstr
@@ -469,13 +560,21 @@ class QueueSimulator(Simulator):
                     t_service = t + server.get_service_time(
                         cust.get_uses_cash()
                     )
+                    logger.debug(f"Scheduled new DEPARTURE {t_service}", extra=self.logstr)
 
                     # schedule departure event
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
-
-                # create new group and update the FES with new arrival events
-                fes = self.create_new_group(t_arr=t, fes=fes)
+<<<<<<< HEAD
+                    cust.set_t_left(t_service)
+=======
+>>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
+                    
+                    # register waiting time 
+                    self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
+                    
+                    # register sojourn time 
+                    self.res.register_sojourn_t(cust)
 
             # handle customer departure event
             elif e.type == Event.DEPARTURE:
@@ -488,12 +587,24 @@ class QueueSimulator(Simulator):
                 # TODO: do we check each queue if the customer is there or do we just store the queue id in the customer obj?
                 q_id = cust.get_queue_id()
                 self.queues[q_id].remove_customer(customer=cust, q_id=q_id)  # type: ignore
+<<<<<<< HEAD
+                
+                # register number of customers in canteen 
+                N -= 1 
+                self.res.register_canteen(t, N)
+=======
+                N -= 1 # update number of customers in canteen 
+>>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
+                
+                logger.debug(
+                    f"Current number of customers in canteen: {N}",
+                    extra = self.logstr,
+                )
 
                 # if there are customers waiting we schedule a departure event for the next customer
                 nr_servers = self.queues[q_id].get_n_servers()  # type: ignore
                 q_length = self.queues[q_id].get_length()  # type: ignore
 
-                # TODO: somehow this is almost never triggered?
                 if q_length >= nr_servers:
                     logging.debug(
                         f"Queue {q_id} has more customers than servers",
@@ -507,10 +618,24 @@ class QueueSimulator(Simulator):
                     t_service = t + server.get_service_time(
                         cust.get_uses_cash()
                     )
+                    logger.debug(f"Scheduled new DEPARTURE {t_service}", extra=self.logstr)
 
                     # schedule departure event
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
+<<<<<<< HEAD
+                    cust.set_t_left(t_service)
+                    
+                    # register waiting time 
+                    self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
+                    
+                    # register sojourn time 
+                    self.res.register_sojourn_t(cust)
+=======
+                    
+                    # register waiting time 
+                    self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
+>>>>>>> 394ca6d2955bb9d391c4a44738d16f3cf3939e3c
 
             # log the FES / debug sleep
             if c.LOG_FES:
@@ -533,6 +658,12 @@ class QueueSimulator(Simulator):
 
         # create group of customers
         group = Group(n_customers, use_cash, t_arr, t_grab)
+        
+        # register group 
+        self.res.register_group(group)
+        
+        # add group arrival to FES
+        fes.add(Event(Event.ARRIVAL_GROUP, t_arr, group))
 
         # create an arrival event for each customer in the group, and add it to the FES
         for idx, customer in enumerate(group.get_customers()):
