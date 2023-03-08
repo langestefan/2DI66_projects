@@ -48,8 +48,10 @@ class CQueue:
         :return: Customer at position pos in queue.
         """
         if self.get_length() < pos:
-            raise ValueError("Queue is not long enough to get customer at pos.")
-        
+            raise ValueError(
+                "Queue is not long enough to get customer at pos."
+            )
+
         return self.queue[pos]
 
     def remove_customer(self, q_id: int, customer=None):

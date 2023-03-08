@@ -29,7 +29,9 @@ if __name__ == "__main__":
     )
 
     # Create a simulator.
-    simulator = sim.QueueSimulator(n_jobs=n_jobs, nr_queues=c.N_QUEUES, nr_servers=c.N_SERVERS)
+    simulator = sim.QueueSimulator(
+        n_jobs=n_jobs, nr_queues=c.N_QUEUES, nr_servers=c.N_SERVERS
+    )
 
     # Run the simulator.
     simulator.run(n=n_sims)

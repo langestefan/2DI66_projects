@@ -40,5 +40,8 @@ class Server:
         else:
             t_service = self.dist_card.rvs(1)
 
-        logger.debug(f'Server {self.get_id()} service time: {round(t_service, 3)}', extra=self.logstr)
+        logger.debug(
+            f"Server {self.get_id()} service time: {round(t_service, 3)}",
+            extra=self.logstr,
+        )
         return t_service

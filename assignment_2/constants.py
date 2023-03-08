@@ -7,8 +7,8 @@ P_CASH = 0.4
 P_GROUP_SIZE = 1 / 3
 
 # mean value for exponential distribution of service time (sec.)
-MU_SERVICE_CASH = 20
-MU_SERVICE_BANK = 12
+MU_SERVICE_CASH = 1  # 20
+MU_SERVICE_BANK = 1  # 12
 
 # mean value for customer to grab their food (sec.)
 MU_CUSTOM_GRAB_FOOD = 80

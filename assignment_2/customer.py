@@ -9,7 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class Customer:
-    def __init__(self, t_arr: float, t_grab_food: float, cash: bool):
+    def __init__(
+        self, t_arr: float, t_grab_food: float, cash: bool, uniq_group_id: int
+    ):
         """
         Creates a new customer.
 
@@ -17,12 +19,14 @@ class Customer:
         :param t_grab_food: The time the customer needs to grab their food.
         :param cash: Whether the customer uses cash to pay. If False, the
                      customer uses a bank card.
+        :param uniq_group_id: Unique group ID of the customer.
         """
         self.logstr = {"className": self.__class__.__name__}
         self.use_cash = cash
         self.t_arrival_group = t_arr
         self.t_grab_food = t_grab_food
         self.queue_id = -1
+        self.uniq_group_id = uniq_group_id
 
         # make sure t_grab_food > t_arrival_group
         if t_grab_food <= t_arr:
@@ -32,6 +36,7 @@ class Customer:
         return (
             f"Customer: t_arr: {round(self.t_arrival_group, 3)}, t_grab_food:"
             f" {round(self.t_grab_food, 3)}, cash: {bool(self.use_cash)}"
+            f", queue_id: {self.queue_id}, uniq_group_id: {self.uniq_group_id}"
         )
 
     def get_t_done_grab(self):

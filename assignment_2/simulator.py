@@ -328,7 +328,10 @@ class QueueSimulator(Simulator):
         self.nr_queues = nr_queues
         self.nr_servers = nr_servers
 
-        logger.debug(f'Nr. of queues: {nr_queues}, nr. of servers: {nr_servers}', extra=self.logstr)
+        logger.debug(
+            f"Nr. of queues: {nr_queues}, nr. of servers: {nr_servers}",
+            extra=self.logstr,
+        )
 
         # we currently only support one server per queue
         if nr_servers != nr_queues:
@@ -387,7 +390,9 @@ class QueueSimulator(Simulator):
                 )
 
             # add servers to each queue
-            assert (self.nr_servers % self.nr_queues == 0), "Number of servers must be divisible by number of queues."
+            assert (
+                self.nr_servers % self.nr_queues == 0
+            ), "Number of servers must be divisible by number of queues."
             nr_servers_per_queue = self.nr_servers // self.nr_queues
             logger.debug(
                 f"Number of servers per queue: {nr_servers_per_queue}",
@@ -422,7 +427,6 @@ class QueueSimulator(Simulator):
         # run simulation until t > SIM_T
         while t < c.SIM_T:
             time.sleep(0.5)
-            logger.debug(f'FES: \n{fes}', extra=self.logstr)
             # TODO: register canteen occupancy (number of customers in canteen)
             # TODO: register queue lengths
             # TODO: register waiting times
@@ -440,7 +444,9 @@ class QueueSimulator(Simulator):
             # handle customer arrival event
             if e.type == Event.ARRIVAL:
                 n_arrivals += 1
-                logger.debug(f'--- ARRIVAL total: {n_arrivals} ---', extra=self.logstr)
+                logger.debug(
+                    f"--- ARRIVAL total: {n_arrivals} ---", extra=self.logstr
+                )
 
                 # get the queue with the shortest length
                 shortest = np.where(q_lengths == np.amin(q_lengths))[0]
@@ -475,7 +481,10 @@ class QueueSimulator(Simulator):
             # handle customer departure event
             elif e.type == Event.DEPARTURE:
                 n_departures += 1
-                logger.debug(f'--- DEPARTURE total: {n_departures} ---', extra=self.logstr)
+                logger.debug(
+                    f"--- DEPARTURE total: {n_departures} ---",
+                    extra=self.logstr,
+                )
                 # get the queue the customer is in and remove the customer from that queue
                 # TODO: do we check each queue if the customer is there or do we just store the queue id in the customer obj?
                 q_id = cust.get_queue_id()
@@ -484,7 +493,6 @@ class QueueSimulator(Simulator):
                 # if there are customers waiting we schedule a departure event for the next customer
                 nr_servers = self.queues[q_id].get_n_servers()  # type: ignore
                 if self.queues[q_id].get_length() >= nr_servers:  # type: ignore
-
                     # get the next customer in the queue
                     cust = self.queues[q_id].get_customer_at_pos(pos=nr_servers - 1)  # type: ignore
 
@@ -497,6 +505,9 @@ class QueueSimulator(Simulator):
                     # schedule departure event
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
+
+            # log the FES
+            logger.debug(f"FES: \n{fes}", extra=self.logstr)
 
     def create_new_group(self, t_arr: float, fes: FES) -> FES:
         """
