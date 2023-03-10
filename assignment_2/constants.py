@@ -30,4 +30,4 @@ N_QUEUES = 3
 LOG_FES = False
 TIME_SLEEP = 0.5
 DEBUG_THROTTLE = False
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO

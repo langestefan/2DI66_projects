@@ -21,7 +21,7 @@ from assignment_2.server import Server
 
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=c.LOG_LEVEL,
     format=(
         "[%(asctime)s] %(levelname)s [%(name)s::%(className)s:%(lineno)s]"
         " %(message)s"
@@ -29,6 +29,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+logging.getLogger('numexpr').setLevel(logging.WARNING)
 
 conf_to_z = {
     0.90: 1.645,
