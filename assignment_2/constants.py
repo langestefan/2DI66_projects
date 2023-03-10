@@ -11,11 +11,13 @@ P_GROUP_SIZE = 1 / 3
 MU_SERVICE_CASH = 20
 MU_SERVICE_BANK = 12
 
+# adjustment factor for service times 
+ADJUST_SERVICE = [1.25, 1, 1]
+
 # mean value for customer to grab their food (sec.)
 MU_CUSTOM_GRAB_FOOD = 80
 
 # customers arrive in groups according to a Poisson process
-# with mean arrival rate of 1, 2, 3, 4 groups per minute
 MU_ARRIVAL_RATE_MIN = [1, 2, 3, 4]
 MU_ARRIVAL_RATE_SEC = [x / 60 for x in MU_ARRIVAL_RATE_MIN]
 
@@ -30,4 +32,4 @@ N_QUEUES = 3
 LOG_FES = False
 TIME_SLEEP = 0.5
 DEBUG_THROTTLE = False
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO

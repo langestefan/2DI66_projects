@@ -15,13 +15,17 @@ logging.basicConfig(
         " %(message)s"
     ),
 )
+logging.getLogger('numexpr').setLevel(logging.WARNING)
     
 os.system("")
 
+import matplotlib.pyplot as plt
+plt.close('all')
+
 
 if __name__ == "__main__":
-    n_jobs = mp.cpu_count() - 1
-    n_sims = 10000
+    n_jobs = mp.cpu_count() - 2
+    n_sims = 100
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -70,4 +74,10 @@ if __name__ == "__main__":
     analysis.plot_hist_wait_t_per_queue(results, lam, binwidth) # queues separated
     analysis.plot_hist_cust_in_cant(results, lam, binwidth) # means of customers in canteen
     analysis.plot_hist_CC_vs_time(results, lam, time_interval) # nr customers in canteen vs time (moving average)
+    analysis.plot_hist_serv_t_per_queue(results, lam, binwidth) # service times 
+    analysis.plot_hist_queue_usage(results, lam, binwidth) # number of customers through queue
     
+    logger.info(
+        f"Ending simulator with {n_jobs} jobs",
+        extra={"className": ""},
+    )

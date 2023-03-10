@@ -26,7 +26,7 @@ class Customer:
         self.t_arrival_group = t_arr
         self.t_grab_food = t_grab_food
         self.t_left = -1 # time customer left canteen 
-        self.queue_id = -1
+        self.queue_id = -1 
         self.uniq_group_id = uniq_group_id
 
         # make sure t_grab_food > t_arrival_group

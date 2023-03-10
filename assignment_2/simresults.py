@@ -46,6 +46,9 @@ class SimResults:
         # lists to gather sojourn times of customers and groups
         self.sojournC = deque()
         self.sojournG = deque()
+        
+        self.S = {x: deque() for x in range(self.nrQueues)} # service times 
+        self.queueUsage = {x: 0 for x in range(self.nrQueues)} # nr of customers in queue
 
     def register_queue_length(self, time, ql):
         """
@@ -71,6 +74,21 @@ class SimResults:
                 "Amount of entries exceeded expected maximum of"
                 f" {self.MAX_ENTRIES}"
             )
+    def register_queue_usage(self, q_id):
+        """
+        Registers number of customers that have passed a queue
+        
+        :param q_id: id of queue
+        """
+        self.queueUsage[q_id] += 1 
+    
+    def register_service_time(self, t, q_id):
+        """
+        Registers service time 
+        
+        :param q_id: id of queue 
+        """
+        self.S[q_id].append(t)
 
     def register_waiting_time(self, w, q):
         """

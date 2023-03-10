@@ -84,6 +84,44 @@ def plot_hist_wait_t_per_queue(results, lam, binwidth):
         ax[q].set_xlabel('Waiting time (s)')
     plt.show()
     
+def plot_hist_serv_t_per_queue(results, lam, binwidth):
+    """
+    Plots histogram of service times for queues in separate subplots 
+    
+    :param results: SimResults object
+    :param lam: index of rate parameter 
+    :param binwidth: width of bins in histogram
+    """
+    fig, ax = plt.subplots(c.N_QUEUES//3, 3)
+    fig.suptitle(f"Service times with lambda = {c.MU_ARRIVAL_RATE_MIN[lam]}\min")
+    
+    for q in range(c.N_QUEUES):
+        wt = results.get_statistics_separate(lam, q)['ServiceTime_all']
+        ax[q].set_title(f"Queue {q}")
+        sns.histplot(wt, ax = ax[q], bins = int(180 / binwidth), color="red")
+        ax[q].set_ylabel('Count')
+        ax[q].set_xlabel('Service time (s)')
+    plt.show()
+    
+def plot_hist_queue_usage(results, lam, binwidth):
+    """
+    Plots histogram of number of customers that passed a queue
+    
+    :param results: SimResults object
+    :param lam: index of rate parameter 
+    :param binwidth: width of bins in histogram
+    """
+    fig, ax = plt.subplots(c.N_QUEUES//3, 3)
+    fig.suptitle(f"Throughput per queue with lambda = {c.MU_ARRIVAL_RATE_MIN[lam]}\min")
+    
+    for q in range(c.N_QUEUES):
+        wt = results.get_statistics_separate(lam, q)['NCustomers_all']
+        ax[q].set_title(f"Queue {q}")
+        sns.histplot(wt, ax = ax[q], bins = int(180 / binwidth), color="red")
+        ax[q].set_ylabel('Count')
+        ax[q].set_xlabel('Number of customers')
+    plt.show()
+    
 def plot_hist_cust_in_cant(results, lam, binwidth):
     """
     Plots histogram of number of customers present in canteen 

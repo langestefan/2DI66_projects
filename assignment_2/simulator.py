@@ -21,7 +21,7 @@ from assignment_2.server import Server
 
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=c.LOG_LEVEL,
     format=(
         "[%(asctime)s] %(levelname)s [%(name)s::%(className)s:%(lineno)s]"
         " %(message)s"
@@ -29,6 +29,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+logging.getLogger('numexpr').setLevel(logging.WARNING)
 
 conf_to_z = {
     0.90: 1.645,
@@ -105,7 +106,7 @@ class SimHistory:
             "SojournTimeGroup_all": deque(), # list of all means 
             "SojournTimeGroup_mean": 0.0,
             "SojournTimeGroup_std": 0.0,
-            "SojournTimeGroup_normal_ci_95": 0.0,
+            "SojournTimeGroup_normal_ci_95": 0.0
         }
         
         # go over all simulation runs 
@@ -229,6 +230,14 @@ class SimHistory:
             "WaitingTime_mean": 0.0,
             "WaitingTime_std": 0.0,
             "WaitingTime_normal_ci_95": 0.0,
+            "ServiceTime_mean": 0.0,
+            "ServiceTime_std": 0.0,
+            "ServiceTime_normal_ci_95": 0.0,
+            "ServiceTime_all": deque(),
+            "NCustomers_all": deque(),
+            "NCustomers_mean": 0.0,
+            "NCustomres_std": 0.0,
+            "NCustomers_normal_ci_95": 0.0
         }
 
         q = queue_nr
@@ -246,6 +255,9 @@ class SimHistory:
             )
             statistics["QueueLength_hist"]+=simulation.get_ql_hist(queue_nr)
             
+            statistics["ServiceTime_all"]+=simulation.S[q]
+            statistics["NCustomers_all"].append(simulation.queueUsage[q])
+            
         statistics["QueueLength_hist"] = statistics["QueueLength_hist"]/(i+1)
 
         # calculate mean and std 
@@ -261,6 +273,19 @@ class SimHistory:
         statistics["WaitingTime_std"] = np.round(
             np.std(statistics["WaitingTime_all"]), 3
         )
+        statistics["ServiceTime_mean"] = np.round(
+            np.mean(statistics["ServiceTime_all"]), 3
+        )
+        statistics["ServiceTime_std"] = np.round(
+            np.std(statistics["ServiceTime_all"]), 3
+        )
+        statistics["NCustomers_mean"] = np.round(
+            np.mean(statistics["NCustomers_all"]), 3
+        )
+        statistics["NCustomers_std"] = np.round(
+            np.std(statistics["NCustomers_all"]), 3
+        )
+        
 
         # calculate 95% confidence intervals
         statistics["QueueLength_normal_ci_95"] = self.__ci_normal(
@@ -276,6 +301,21 @@ class SimHistory:
             statistics["WaitingTime_std"] ** 2,
             0.95,
         )
+
+        statistics["ServiceTime_normal_ci_95"] = self.__ci_normal(
+            self.nr_simulations,
+            statistics["ServiceTime_mean"],
+            statistics["ServiceTime_std"] ** 2,
+            0.95,
+        )
+        
+        statistics["NCustomers_normal_ci_95"] = self.__ci_normal(
+            self.nr_simulations,
+            statistics["NCustomers_mean"],
+            statistics["NCustomers_std"] ** 2,
+            0.95,
+        )
+
 
         return statistics
 
@@ -347,6 +387,7 @@ class Simulator(ABC):
                 # add the results to the sim history
                 for result in results:
                     self.sim_history.add_sim_run(result)
+                    
         else:
             for i in range(n):
                 result = self._do_one_run(i)
@@ -359,6 +400,7 @@ class Simulator(ABC):
 
         :param n: The number of the game run.
         """
+        
         pass
 
 
@@ -414,7 +456,7 @@ class QueueSimulator(Simulator):
 
         :param n: The number of the simulation run.
         :return: The simulation results.
-        """
+        """       
         res = np.empty(len(self.arrival_time_dist), dtype = SimResults)
         
         # run simulation once for each rate parameter
@@ -532,15 +574,19 @@ class QueueSimulator(Simulator):
 
                 # store q_id in customer object
                 cust.set_queue_id(q_id)
+                
+                # update number of customers through queue 
+                self.res.register_queue_usage(q_id)
 
                 # if there was a free server we schedule a departure event
                 if self.queues[q_id].get_length() <= self.queues[q_id].get_n_servers():  # type: ignore
                     # get the server that will serve the customer
-                    # TODO: for now we only support one server per queue so id is always 0
                     server = self.queues[q_id].get_server(server_id=0)  # type: ignore
-                    t_service = t + server.get_service_time(
-                        cust.get_uses_cash()
-                    )
+                    t_service = server.get_service_time(
+                        cust.get_uses_cash())*c.ADJUST_SERVICE[q_id]
+                    self.res.register_service_time(t_service, q_id)
+                    t_service += t 
+                    
                     logger.debug(f"Scheduled new DEPARTURE {t_service}", extra=self.logstr)
 
                     # schedule departure event
@@ -562,7 +608,6 @@ class QueueSimulator(Simulator):
                     extra=self.logstr,
                 )
                 # get the queue the customer is in and remove the customer from that queue
-                # TODO: do we check each queue if the customer is there or do we just store the queue id in the customer obj?
                 q_id = cust.get_queue_id()
                 self.queues[q_id].remove_customer(customer=cust, q_id=q_id)  # type: ignore
                 
@@ -589,9 +634,11 @@ class QueueSimulator(Simulator):
 
                     # get the server that will serve the customer
                     server = self.queues[q_id].get_server(server_id=0)  # type: ignore
-                    t_service = t + server.get_service_time(
-                        cust.get_uses_cash()
-                    )
+                    t_service = server.get_service_time(
+                        cust.get_uses_cash())*c.ADJUST_SERVICE[q_id]
+                    self.res.register_service_time(t_service, q_id)
+                    t_service += t 
+                    
                     logger.debug(f"Scheduled new DEPARTURE {t_service}", extra=self.logstr)
 
                     # schedule departure event
