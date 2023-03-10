@@ -62,11 +62,6 @@ class SimResults:
         
         for q in range(len(ql)):
             self.histQL[min(ql[q], self.MAX_ENTRIES), q] += (time - self.oldTime)
-            
-        # queue length registered at each change, even if change only
-        # occurred in one queue only
-        self.sumQL += np.array(ql * (time - self.oldTime))
-        self.sumQL2 += np.array(ql * ql * (time - self.oldTime))
 
         if self.nQL >= self.MAX_ENTRIES:
             raise ValueError(
