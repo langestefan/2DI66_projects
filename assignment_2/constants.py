@@ -31,3 +31,8 @@ LOG_FES = False
 TIME_SLEEP = 0.5
 DEBUG_THROTTLE = False
 LOG_LEVEL = logging.INFO
+
+# data that will not be saved 
+NOT_SAVED = ['QueueLengths_all', 'CustomersCanteen_all', 'CustomersCanteen_values',
+             'CustomersCanteen_times', 'QueueLengths_all', 'SojournTimeCustomer_all',
+             'SojournTimeGroup_all', 'WaitingTime_all', 'QueueLength_hist']

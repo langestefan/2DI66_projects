@@ -2,10 +2,53 @@ import assignment_2.constants as c
 from collections import deque
 import numpy as np 
 import itertools
+import csv 
 
 import matplotlib.pyplot as plt 
 import seaborn as sns 
 plt.style.use("ggplot")  # plotting style
+
+def save_files(results, n):
+    """
+    Saves results to CSV files 
+    
+    :param results: SimResults object 
+    :param n: Number of runs included 
+    """
+    lst_all = [0]*len(c.MU_ARRIVAL_RATE_MIN)
+    lst_separate = [0]*len(c.MU_ARRIVAL_RATE_MIN)*c.N_QUEUES
+    
+    ind = 0 
+    # gather all dictionaries into lists
+    for lam in range(len(c.MU_ARRIVAL_RATE_MIN)):
+        stats = results.get_statistics_all(lam)
+        for entry in c.NOT_SAVED:
+            if entry in stats.keys():
+                del stats[entry]
+        lst_all[lam] = stats
+        
+        for q in range(c.N_QUEUES):
+            stats = results.get_statistics_separate(lam, q)
+            for entry in c.NOT_SAVED:
+                if entry in stats.keys():
+                    del stats[entry]
+            lst_separate[ind] = stats
+            ind += 1 
+            
+    # save results to CSV files 
+    # CustomersCanteen_times was messing up lay-out of CSV file 
+    fieldnames = list(lst_all[0].keys())
+    with open(f"results_all_nrRuns={n}.csv", 'w', newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
+        writer.writeheader()
+        writer.writerows(lst_all)
+        
+    fieldnames = list(lst_separate[0].keys())
+    with open(f"results_separate_nrRuns={n}_nrQueues={c.N_QUEUES}.csv", 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames = fieldnames)
+        writer.writeheader()
+        writer.writerows(lst_separate)
+            
 
 def plot_QL_hist_all(results, lam, maxq=50):
     """
