@@ -62,6 +62,9 @@ class SimResults:
         
         for q in range(len(ql)):
             self.histQL[min(ql[q], self.MAX_ENTRIES), q] += (time - self.oldTime)
+            
+        self.times.append(time)
+        self.oldTime = time
 
         if self.nQL >= self.MAX_ENTRIES:
             raise ValueError(
