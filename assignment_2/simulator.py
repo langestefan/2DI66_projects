@@ -509,7 +509,6 @@ class QueueSimulator(Simulator):
                 t_arr_new = t+dist.rvs(1)
                 fes = self.create_new_group(t_arr=t_arr_new, fes=fes)
                 
-                # register number of customers in canteen 
                 N += e.get_customer().get_nr_customers()
                 self.res.register_canteen(t, N)
             
@@ -548,7 +547,7 @@ class QueueSimulator(Simulator):
                     dep_event = Event(Event.DEPARTURE, t_service, cust)
                     fes.add(dep_event)
                     cust.set_t_left(t_service)
-                    
+
                     # register waiting time 
                     self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
                     
@@ -605,9 +604,6 @@ class QueueSimulator(Simulator):
                     
                     # register sojourn time 
                     self.res.register_sojourn_t(cust)
-                    
-                    # register waiting time 
-                    self.res.register_waiting_time(t-cust.get_t_done_grab(), cust.get_queue_id())
 
             # log the FES / debug sleep
             if c.LOG_FES:

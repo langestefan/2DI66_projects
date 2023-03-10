@@ -67,8 +67,6 @@ class SimResults:
         # occurred in one queue only
         self.sumQL += np.array(ql * (time - self.oldTime))
         self.sumQL2 += np.array(ql * ql * (time - self.oldTime))
-        self.times.append(time)
-        self.oldTime = time
 
         if self.nQL >= self.MAX_ENTRIES:
             raise ValueError(
