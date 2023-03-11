@@ -25,7 +25,7 @@ plt.close('all')
 
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 2
-    n_sims = 100
+    n_sims = 10000
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -54,7 +54,11 @@ if __name__ == "__main__":
     time_interval = 50
     
     for lam in range(len(c.MU_ARRIVAL_RATE_MIN)):
-        analysis.plot_QL_hist_all(results, lam, maxq=50) # all queues together 
+        if lam < 3:
+            analysis.plot_QL_hist_all(results, lam, maxq=50) # all queues together 
+        else:
+            analysis.plot_QL_hist_all(results, lam, maxq=75) # all queues together 
+        
         analysis.plot_QL_hist_per_queue(results, lam, maxq=50) # queues separated 
         analysis.plot_hist_wait_t_all(results, lam, binwidth) # all queues together
         analysis.plot_hist_wait_t_per_queue(results, lam, binwidth) # queues separated
@@ -65,3 +69,7 @@ if __name__ == "__main__":
         f"Ending simulator with {n_jobs} jobs",
         extra={"className": ""},    
     )
+    
+        
+
+    

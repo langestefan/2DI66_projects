@@ -22,14 +22,14 @@ def save_files(results, n):
     # gather all dictionaries into lists
     for lam in range(len(c.MU_ARRIVAL_RATE_MIN)):
         stats = results.get_statistics_all(lam)
-        for entry in c.NOT_SAVED:
+        for entry in c.NOT_SAVED_ALL:
             if entry in stats.keys():
                 del stats[entry]
         lst_all[lam] = stats
         
         for q in range(c.N_QUEUES):
             stats = results.get_statistics_separate(lam, q)
-            for entry in c.NOT_SAVED:
+            for entry in c.NOT_SAVED_SEP:
                 if entry in stats.keys():
                     del stats[entry]
             lst_separate[ind] = stats
