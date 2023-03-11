@@ -236,7 +236,7 @@ class SimHistory:
             "ServiceTime_all": deque(),
             "NCustomers_all": deque(),
             "NCustomers_mean": 0.0,
-            "NCustomres_std": 0.0,
+            "NCustomers_std": 0.0,
             "NCustomers_normal_ci_95": 0.0
         }
 

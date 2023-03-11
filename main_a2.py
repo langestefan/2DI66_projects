@@ -72,6 +72,12 @@ if __name__ == "__main__":
         extra={"className": ""},    
     )
     
-        
-
+# =============================================================================
+#     pickle.dump(results.get_statistics_all(0), open("lam=1.pkl", 'wb'))
+#     pickle.dump(results.get_statistics_all(1), open("lam=2.pkl", 'wb'))
+#     pickle.dump(results.get_statistics_all(2), open("lam=3.pkl", 'wb'))
+#     pickle.dump(results.get_statistics_all(3), open("lam=4.pkl", 'wb'))
+#     for l, q in zip([0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3], [0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2]):
+#         pickle.dump(results.get_statistics_separate(l, q), open(f"lam={l+1}_queue={q+1}.pkl", 'wb'))
+# =============================================================================
     
