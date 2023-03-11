@@ -137,7 +137,7 @@ class SimHistory:
                 simulation.get_mean_sojourn_group()
             )
         
-        statistics["QueueLength_hist"] = statistics["QueueLength_hist"]/(i+1)
+        statistics["QueueLength_hist"] = statistics["QueueLength_hist"]/(self.nr_simulations*c.N_QUEUES)
             
         # calculate mean and std 
         statistics["QueueLength_mean"] = np.round(

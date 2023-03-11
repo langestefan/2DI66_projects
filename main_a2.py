@@ -19,13 +19,13 @@ logging.getLogger('numexpr').setLevel(logging.WARNING)
     
 os.system("")
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
 plt.close('all')
 
 
 if __name__ == "__main__":
     n_jobs = mp.cpu_count() - 2
-    n_sims = 100
+    n_sims = 5000
 
     # Start logging
     logger = logging.getLogger(__name__)
@@ -45,39 +45,33 @@ if __name__ == "__main__":
     # Get the results.
     results = simulator.get_sim_history()
     
-    # Save results 
-    with open(f"results_n={n_sims}.pkl", 'wb') as f:
-        pickle.dump(results, f)
-    with open(f"logger_n={n_sims}.pkl", 'wb') as f:
-        pickle.dump(logger, f)
-    with open(f"simulator={n_sims}.pkl", 'wb') as f:
-        pickle.dump(simulator, f)
-    
-    # Load files
-    #with open(f"results_n={n_sims}.pkl", 'rb') as f:
-    #    results = pickle.load(f)
-    #with open(f"logger_n={n_sims}.pkl", 'rb') as f:
-    #    logger = pickle.load(f)
-    #with open(f"simulator={n_sims}.pkl", 'rb') as f:
-    #    simulator = pickle.load(f)
+    # Save some results 
+    analysis.save_files(results, n_sims)
     
     # Plot results 
     # some parameters that can be defined (lam = index of rate parameter)
-    lam = 4
-    lam = c.MU_ARRIVAL_RATE_MIN.index(lam)
-    binwidth = 5
+    binwidth = 10
     time_interval = 50
     
-    analysis.plot_QL_hist_all(results, lam, maxq=50) # all queues together 
-    analysis.plot_QL_hist_per_queue(results, lam, maxq=50) # queues separated 
-    analysis.plot_hist_wait_t_all(results, lam, binwidth) # all queues together
-    analysis.plot_hist_wait_t_per_queue(results, lam, binwidth) # queues separated
-    analysis.plot_hist_cust_in_cant(results, lam, binwidth) # means of customers in canteen
-    analysis.plot_hist_CC_vs_time(results, lam, time_interval) # nr customers in canteen vs time (moving average)
-    analysis.plot_hist_serv_t_per_queue(results, lam, binwidth) # service times 
-    analysis.plot_hist_queue_usage(results, lam, binwidth) # number of customers through queue
+    for lam in range(len(c.MU_ARRIVAL_RATE_MIN)):
+        if lam < 3:
+            analysis.plot_QL_hist_all(results, lam, maxq=50) # all queues together 
+        else:
+            analysis.plot_QL_hist_all(results, lam, maxq=75) # all queues together 
+        
+        analysis.plot_QL_hist_per_queue(results, lam, maxq=50) # queues separated 
+        analysis.plot_hist_wait_t_all(results, lam, binwidth) # all queues together
+        analysis.plot_hist_wait_t_per_queue(results, lam, binwidth) # queues separated
+        analysis.plot_hist_cust_in_cant(results, lam, binwidth) # means of customers in canteen
+        analysis.plot_hist_CC_vs_time(results, lam, time_interval) # nr customers in canteen vs time (moving average)
+        analysis.plot_hist_serv_t_per_queue(results, lam, binwidth) # service times 
+        analysis.plot_hist_queue_usage(results, lam, binwidth) # number of customers through queue
     
     logger.info(
         f"Ending simulator with {n_jobs} jobs",
-        extra={"className": ""},
+        extra={"className": ""},    
     )
+    
+        
+
+    
