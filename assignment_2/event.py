@@ -9,7 +9,7 @@ class Event:
     def __init__(self, typ: int, time: float, cust: Customer):
         """_summary_
 
-        :param: typ: Event type (arrival or departure)
+        :param: typ: Event type (arrival, departure or arrival of group)
         :param: time: Time of event
         :param: cust: Customer number
         """

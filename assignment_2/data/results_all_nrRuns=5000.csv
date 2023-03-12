@@ -1,0 +1,5 @@
+QueueLength_mean,QueueLength_std,QueueLength_normal_ci_95,WaitingTime_mean,WaitingTime_std,WaitingTime_normal_ci_95,CustomersCanteen_mean,CustomersCanteen_std,CustomersCanteen_normal_ci_95,SojournTimeCustomer_mean,SojournTimeCustomer_std,SojournTimeCustomer_normal_ci_95,SojournTimeGroup_mean,SojournTimeGroup_std,SojournTimeGroup_normal_ci_95
+0.344,0.078,"(0.342, 0.346)",1.333,1.194,"(1.3, 1.366)",6.888,1.353,"(6.85, 6.926)",95.858,6.632,"(95.674, 96.042)",147.676,14.068,"(147.286, 148.066)"
+0.867,0.274,"(0.859, 0.875)",4.642,2.6,"(4.57, 4.714)",12.645,1.968,"(12.59, 12.7)",103.005,8.041,"(102.782, 103.228)",153.805,12.24,"(153.466, 154.144)"
+2.384,1.401,"(2.345, 2.423)",12.759,8.149,"(12.533, 12.985)",20.886,5.192,"(20.742, 21.03)",125.325,23.608,"(124.671, 125.979)",177.112,26.985,"(176.364, 177.86)"
+11.91,7.022,"(11.715, 12.105)",55.085,30.933,"(54.228, 55.942)",53.537,22.481,"(52.914, 54.16)",251.936,92.31,"(249.377, 254.495)",312.08,99.897,"(309.311, 314.849)"
