@@ -25,7 +25,7 @@ class Customer:
         self.use_cash = cash
         self.t_arrival_group = t_arr
         self.t_grab_food = t_grab_food
-        self.t_left = -1 # time customer left canteen 
+        self.t_left = -1  # time customer left canteen
         self.queue_id = -1
         self.uniq_group_id = uniq_group_id
 
@@ -47,10 +47,10 @@ class Customer:
         :return: Time stamp of done grabbing food.
         """
         return self.t_grab_food
-    
+
     def get_t_arrival(self):
         """
-        Returns the time customer entered canteen 
+        Returns the time customer entered canteen
 
         :return: Time stamp of customer entering canteen.
         """
@@ -63,25 +63,25 @@ class Customer:
         :return: True if the customer uses cash, False otherwise.
         """
         return self.use_cash
-    
+
     def get_t_left(self):
         """
         Returns time customer left canteen (t = -1 if customer is still in canteen)
 
-        :return: Time customer left canteen 
+        :return: Time customer left canteen
         """
         return self.t_left
-    
+
     def set_t_left(self, t):
         """
-        Sets time stamp of when customer left canteen 
-        
-        :param t: Time at which customer left canteen 
+        Sets time stamp of when customer left canteen
+
+        :param t: Time at which customer left canteen
         """
         if t < self.get_t_done_grab():
             raise ValueError("Departure time is earalier than arrival time")
         self.t_left = t
-        
+
     def set_queue_id(self, queue_id: int):
         """
         Sets the queue id of the customer.

@@ -88,13 +88,21 @@ class CQueue:
         # this customer must match the one we received from a DEPARTURE event
         if customer is not None:
             logger.debug(f"Comparing customer: {customer}", extra=self.logstr)
-            if (
-                cust_front_q.get_t_done_grab() != customer.get_t_done_grab()
-            ):  # compare arrival timestamps
-                raise ValueError(
-                    "Customer we want to remove is not the customer at the"
-                    " front of the queue."
-                )
+
+            # if there is one server per queue we have to sort by the arrival time
+            # since that is the point int time they arrived in the queue
+            # if there are multiple servers per queue we have to sort by the
+            # departure time since that is the point in time they left the server
+            if len(self.servers) == 1:
+                t_front_q = cust_front_q.get_t_done_grab()  # arrival timestamp
+                t_customer = customer.get_t_done_grab()  # arrival timestamp
+                if t_front_q != t_customer:  # compare arrival timestamps
+                    raise ValueError(
+                        f"Customer ({t_front_q}) we want to remove is not the"
+                        f" customer ({t_customer}) at the front of the queue."
+                    )
+            else:
+                pass
 
         return cust_front_q
 

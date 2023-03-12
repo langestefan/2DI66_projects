@@ -24,16 +24,23 @@ SIM_T = 3600
 
 # number of servers / queues
 N_SERVERS = 3
-N_QUEUES = 3
+N_QUEUES = 1
 
 # debugging
-LOG_FES = False
+LOG_FES = True
 TIME_SLEEP = 0.5
 DEBUG_THROTTLE = False
 LOG_LEVEL = logging.INFO
 
-# data that will not be saved 
-NOT_SAVED_ALL = ['CustomersCanteen_all', 'CustomersCanteen_values', 'CustomersCanteen_times', 
-                 'QueueLengths_all', 'SojournTimeCustomer_all', 'SojournTimeGroup_all', 
-                 'WaitingTime_all', 'QueueLength_hist']
-NOT_SAVED_SEP = ['QueueLenths_all', 'WaitingTime_all', 'QueueLength_hist']
+# data that will not be saved
+NOT_SAVED_ALL = [
+    "CustomersCanteen_all",
+    "CustomersCanteen_values",
+    "CustomersCanteen_times",
+    "QueueLengths_all",
+    "SojournTimeCustomer_all",
+    "SojournTimeGroup_all",
+    "WaitingTime_all",
+    "QueueLength_hist",
+]
+NOT_SAVED_SEP = ["QueueLenths_all", "WaitingTime_all", "QueueLength_hist"]
