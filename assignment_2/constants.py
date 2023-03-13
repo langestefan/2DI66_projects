@@ -30,7 +30,7 @@ N_QUEUES = 1
 LOG_FES = True
 TIME_SLEEP = 0.5
 DEBUG_THROTTLE = False
-LOG_LEVEL = logging.INFO
+LOG_LEVEL = logging.DEBUG
 
 # data that will not be saved
 NOT_SAVED_ALL = [

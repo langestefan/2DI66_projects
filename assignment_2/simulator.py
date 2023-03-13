@@ -454,9 +454,10 @@ class QueueSimulator(Simulator):
                 extra=self.logstr,
             )
 
-            for queue in self.queues:
+            for idx, queue in enumerate(self.queues):
                 for s in range(nr_servers_per_queue):
                     queue.add_server(self.servers[s])
+                logger.debug(f'Number of servers in queue {idx}: {queue.get_n_servers()}', extra=self.logstr)
 
             # run simulation
             self.simulate_queue(dist)
@@ -493,6 +494,7 @@ class QueueSimulator(Simulator):
 
         # run simulation until t > SIM_T
         while t < c.SIM_T:
+            # time.sleep(1)
             # get queue lengths
             q_lengths = self.get_queue_lengths()
             self.res.register_queue_length(t, q_lengths)

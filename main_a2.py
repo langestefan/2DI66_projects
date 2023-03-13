@@ -32,8 +32,8 @@ time.sleep(3)
 
 
 if __name__ == "__main__":
-    n_jobs = mp.cpu_count()
-    n_sims = 5000
+    n_jobs = 1  # mp.cpu_count()
+    n_sims = 1
 
     # Start logging
     logger = logging.getLogger(__name__)
